@@ -32,6 +32,8 @@ async function loadProduct() {
 
     const data = productSnap.data();
 
+    console.log(data);
+    
     container.innerHTML = `
         <div class="product-details">
 
