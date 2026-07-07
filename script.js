@@ -13,6 +13,8 @@ async function loadProducts() {
 
     const snapshot = await getDocs(collection(db, "products"));
 
+    console.log(snapshot.size)
+
     snapshot.forEach((product) => {
 
     // ...
@@ -20,11 +22,13 @@ async function loadProducts() {
 });
 
 activateCart();
-activateFavorites();
+// activateFavorites();
 activateCategoryFilter();
 renderCart();
 
 }
+
+
 
         const data = product.data();
 
