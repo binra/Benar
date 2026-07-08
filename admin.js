@@ -1,3 +1,13 @@
+const password = prompt("Enter Admin Password");
+
+if (password !== "9NG5Y0FRQEG") {
+
+    alert("Access Denied");
+
+    window.location.href = "index.html";
+
+}
+
 import { db } from "./firebase.js";
 import {
     collection,
