@@ -122,6 +122,7 @@ async function loadProducts() {
     });
 
 }
+console.log("Delete buttons activated");
 document.querySelectorAll(".delete-btn").forEach(button => {
 
     button.onclick = async () => {
