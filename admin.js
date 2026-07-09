@@ -5,7 +5,9 @@ import {
     getDocs,
     deleteDoc,
     updateDoc,
-    doc
+    doc,
+    orderBy,
+    query
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const password = prompt("Enter Admin Password");
@@ -17,6 +19,7 @@ if (password !== "9NG5Y0FRQEG") {
 
 const form = document.getElementById("productForm");
 const adminProducts = document.getElementById("adminProducts");
+const ordersList = document.getElementById("ordersList");
 let editingId = null;
 // ======================
 // Add product
