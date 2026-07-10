@@ -196,10 +196,32 @@ checkoutBtn.onclick = async () => {
 
     }
 
+    const customerName =
+    document.getElementById("customer-name").value;
+
+const customerPhone =
+    document.getElementById("customer-phone").value;
+
+const customerAddress =
+    document.getElementById("customer-address").value;
+
+if (!customerName || !customerPhone || !customerAddress) {
+
+    alert("تکایە هەموو زانیارییەکان پڕ بکەرەوە.");
+
+    return;
+
+}
     await addDoc(collection(db, "orders"), {
 
+        customerName,
+        customerPhone,
+        customerAddress,
+
         items: cart,
+
         total: cart.reduce((sum, item) => sum + item.price, 0),
+
         createdAt: new Date().toISOString()
 
     });
