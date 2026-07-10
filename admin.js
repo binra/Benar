@@ -209,14 +209,21 @@ async function loadOrders() {
         ordersList.innerHTML += `
 
             <div class="product">
+        <h3>🛒 New Order</h3>
 
-                <h3>Order</h3>
+                <p><strong>👤 Name:</strong> ${data.customerName}</p>
+
+                <p><strong>📞 Phone:</strong> ${data.customerPhone}</p>
+
+                <p><strong>📍 Address:</strong> ${data.customerAddress}</p>
+
+                <hr>
 
                 <ul>${items}</ul>
 
-                <p><strong>Total:</strong> $${data.total}</p>
+                <p><strong>💰 Total:</strong> $${data.total}</p>
 
-                <small>${data.createdAt}</small>
+                <small>🕒 ${data.createdAt}</small>
 
             </div>
 
