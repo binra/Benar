@@ -206,6 +206,23 @@ async function loadOrders() {
 
         }
 
+document.querySelectorAll(".complete-btn").forEach(button => {
+
+    button.onclick = async () => {
+
+        await updateDoc(
+            doc(db, "orders", button.dataset.id),
+            {
+                status: "Completed"
+            }
+        );
+
+        loadOrders();
+
+    };
+
+});
+
         ordersList.innerHTML += `
 
             <div class="product">
