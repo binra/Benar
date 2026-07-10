@@ -215,8 +215,8 @@ async function loadOrders() {
             ✅ Completed
         </button>
 
-        <button class="delete-order-btn" data-id="${order.id}">
-         🗑️ Delete
+        <button class="cancel-btn" data-id="${order.id}">
+            🔴 Cancel
         </button>
 
                 <p><strong>👤 Name:</strong> ${data.customerName}</p>
@@ -257,14 +257,15 @@ async function loadOrders() {
     };
 
 });
-document.querySelectorAll(".delete-order-btn").forEach(button => {
+document.querySelectorAll(".cancel-btn").forEach(button => {
 
     button.onclick = async () => {
-
-        if (!confirm("Delete this order?")) return;
-
-        await deleteDoc(
-            doc(db, "orders", button.dataset.id)
+    
+        await updateDoc(
+            doc(db, "orders", button.dataset.id),
+            {
+                status: "Cancelled"
+            }
         );
 
         loadOrders();
