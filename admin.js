@@ -265,6 +265,8 @@ async function loadOrders() {
     }
 
 };
+
+});
 document.querySelectorAll(".cancel-btn").forEach(button => {
 
     button.onclick = async () => {
@@ -289,6 +291,9 @@ document.querySelectorAll(".cancel-btn").forEach(button => {
     }
 
 };
+
+});
+
 }
 
 loadOrders();
