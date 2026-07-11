@@ -262,7 +262,7 @@ async function loadOrders() {
         alert("Completed ✅");
 
         loadOrders();
-
+        loadDashboard();
     } catch (e) {
 
         alert(e.message);
@@ -288,7 +288,7 @@ document.querySelectorAll(".cancel-btn").forEach(button => {
         alert("Cancelled ✅");
 
         loadOrders();
-
+        loadDashboard();
     } catch (e) {
 
         alert(e.message);
@@ -298,6 +298,7 @@ document.querySelectorAll(".cancel-btn").forEach(button => {
 };
 
 });
+}
 
 async function loadDashboard() {
 
@@ -326,9 +327,9 @@ async function loadDashboard() {
     completedOrders.textContent = completed;
     cancelledOrders.textContent = cancelled;
 
-}
-}
+
 
 loadOrders();
 
 loadDashboard();
+}
