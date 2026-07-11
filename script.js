@@ -31,18 +31,18 @@ async function loadProducts() {
 
                 <p>$${data.price}</p>
 
-                <button class="add-cart">
-                    Add To Cart
-                </button>
+                <a href="${data.link}" target="_blank" class="buy-btn">
+                    Buy on Amazon
+                </a>
 
             </div>
         `;
 
     });
 
-    activateCart();
+
     activateCategoryFilter();
-    renderCart();
+
 
 }
 
@@ -68,86 +68,7 @@ searchInput.addEventListener("keyup", () => {
     });
 
 });
-// Shopping Cart
 
-// ======================
-// Shopping Cart
-// ======================
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-const cartCount = document.getElementById("cart-count");
-const cartItems = document.getElementById("cart-items");
-const totalPrice = document.getElementById("total-price");
-
-function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-function renderCart() {
-
-    cartItems.innerHTML = "";
-
-    let total = 0;
-
-    cart.forEach((item, index) => {
-
-        total += item.price;
-
-        const li = document.createElement("li");
-
-        li.innerHTML = `
-            ${item.name} - $${item.price}
-            <button class="delete-item">Delete</button>
-        `;
-
-        li.querySelector(".delete-item").onclick = () => {
-
-            cart.splice(index, 1);
-
-            saveCart();
-
-            renderCart();
-
-        };
-
-        cartItems.appendChild(li);
-
-    });
-
-    cartCount.textContent = cart.length;
-    totalPrice.textContent = total;
-
-}
-
-function activateCart() {
-
-    document.querySelectorAll(".add-cart").forEach(button => {
-
-        button.onclick = () => {
-
-            const product = button.parentElement;
-
-            const name = product.querySelector("h2").textContent;
-
-            const price = parseInt(
-                product.querySelector("p").textContent.replace("$", "")
-            );
-
-      cart.push({
-    name,
-    price
-});
-
-saveCart();
-renderCart();
-
-        };
-
-    });
-
-}
-  
 // Category Filter
 
 function activateCategoryFilter() {
@@ -184,54 +105,3 @@ function activateCategoryFilter() {
     });
 
 }
-const checkoutBtn = document.getElementById("checkout-btn");
-
-checkoutBtn.onclick = async () => {
-
-    if (cart.length === 0) {
-
-        alert("سەبەتی کڕین بەتاڵە");
-
-        return;
-
-    }
-
-    const customerName =
-    document.getElementById("customer-name").value;
-
-const customerPhone =
-    document.getElementById("customer-phone").value;
-
-const customerAddress =
-    document.getElementById("customer-address").value;
-
-if (!customerName || !customerPhone || !customerAddress) {
-
-    alert("تکایە هەموو زانیارییەکان پڕ بکەرەوە.");
-
-    return;
-
-}
-    await addDoc(collection(db, "orders"), {
-
-        customerName,
-        customerPhone,
-        customerAddress,
-
-        items: cart,
-
-        total: cart.reduce((sum, item) => sum + item.price, 0),
-
-        createdAt: new Date().toISOString()
-
-    });
-
-    alert("داواکارییەکەت بە سەرکەوتوویی نێردرا ✅");
-
-    cart = [];
-
-    saveCart();
-
-    renderCart();
-
-};

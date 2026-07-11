@@ -189,3 +189,18 @@ header{
     font-size:32px;
     color:#007bff;
 }
+.buy-btn{
+    display:block;
+    background:#ff9900;
+    color:#fff;
+    text-decoration:none;
+    padding:12px;
+    border-radius:8px;
+    text-align:center;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.buy-btn:hover{
+    background:#e68a00;
+}

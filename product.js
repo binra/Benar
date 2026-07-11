@@ -10,30 +10,24 @@ const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
 const container = document.getElementById("productDetails");
+
 async function loadProduct() {
 
     if (!id) {
-
         container.innerHTML = "<h2>Product not found.</h2>";
         return;
-
     }
 
     const productRef = doc(db, "products", id);
-
     const productSnap = await getDoc(productRef);
 
     if (!productSnap.exists()) {
-
         container.innerHTML = "<h2>Product not found.</h2>";
         return;
-
     }
 
     const data = productSnap.data();
 
-    console.log(data);
-    
     container.innerHTML = `
         <div class="product-details">
 
@@ -49,9 +43,9 @@ async function loadProduct() {
                     ${data.description}
                 </p>
 
-                <button class="add-cart">
-                    Add To Cart
-                </button>
+                <a href="${data.link}" target="_blank" class="buy-btn">
+                    Buy on Amazon
+                </a>
 
                 <br><br>
 
