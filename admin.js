@@ -19,18 +19,21 @@ import {
 const email = prompt("Admin Email");
 const password = prompt("Admin Password");
 
-signInWithEmailAndPassword(auth, email, password)
-.catch(() => {
-    alert("Wrong email or password");
-    window.location.href = "index.html";
-});
+async function login() {
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) {
+        loadProducts();
+        loadOrders();
+        loadDashboard();
+
+    } catch (e) {
+        alert("Wrong email or password");
         window.location.href = "index.html";
     }
-});
+}
 
+login();
 const form = document.getElementById("productForm");
 const adminProducts = document.getElementById("adminProducts");
 const ordersList = document.getElementById("ordersList");
@@ -342,8 +345,3 @@ async function loadDashboard() {
     cancelledOrders.textContent = cancelled;
 
 }
-loadProducts();
-
-loadOrders();
-
-loadDashboard();
