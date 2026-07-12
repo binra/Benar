@@ -316,3 +316,24 @@ header{
     margin:auto;
     line-height:1.7;
 }
+.best-deals{
+    background:#fff7e6;
+    text-align:center;
+    padding:60px 20px;
+    border-top:1px solid #eee;
+    border-bottom:1px solid #eee;
+}
+
+.best-deals h2{
+    font-size:36px;
+    color:#ff8800;
+    margin-bottom:15px;
+}
+
+.best-deals p{
+    font-size:18px;
+    color:#555;
+    max-width:700px;
+    margin:auto;
+    line-height:1.7;
+}
