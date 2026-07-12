@@ -7,97 +7,75 @@ import {
     deleteDoc,
     updateDoc,
     doc,
-
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 import {
-    signInWithEmailAndPassword,
-    
+    signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
 const email = prompt("Admin Email");
 const password = prompt("Admin Password");
 
-async function login() {
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
+await signInWithEmailAndPassword(auth, email, password);
 
-        loadProducts();
 
-        loadDashboard();
-
-    } catch (e) {
-        alert("Wrong email or password");
-        window.location.href = "index.html";
-    }
-}
-
-login();
 const form = document.getElementById("productForm");
 const adminProducts = document.getElementById("adminProducts");
 
+
 let editingId = null;
-// ======================
-// Add product
-// ======================
+
 
 form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const title = document.getElementById("title").value;
+    const product = {
 
-    const price = Number(
-        document.getElementById("price").value
-    );
+        title: title.value,
 
-    const image = document.getElementById("image").value;
+        price: Number(price.value),
 
-    const category = document.getElementById("category").value;
+        image: image.value,
 
-    const link = document.getElementById("link").value;
-    if (!link) {
-    alert("Affiliate Link is required.");
-    return;
-}
-    const description =
-        document.getElementById("description").value;
+        category: category.value,
+
+        link: link.value,
+
+        description: description.value
+
+    };
+
+    if (!product.link) {
+
+        alert("Affiliate Link Required");
+
+        return;
+
+    }
 
     if (editingId) {
 
-    await updateDoc(doc(db, "products", editingId), {
+        await updateDoc(
+            doc(db, "products", editingId),
+            product
+        );
 
-        title,
-        price,
-        image,
-        category,
-        link,
-        description
+        editingId = null;
 
-    });
+        alert("Updated ✅");
 
-    editingId = null;
+    } else {
 
-    alert("Product Updated Successfully â");
+        await addDoc(
+            collection(db, "products"),
+            product
+        );
 
-} else {
+        alert("Added ✅");
 
-    await addDoc(collection(db, "products"), {
-
-        title,
-        price,
-        image,
-        category,
-        link,
-        description
-
-    });
-
-alert("Product Added Successfully ✅");
-
-loadProducts();
-loadDashboard();
-}
+    }
 
     form.reset();
 
@@ -105,9 +83,7 @@ loadDashboard();
 
 });
 
-// ======================
-// Load Products
-// ======================
+
 
 async function loadProducts() {
 
@@ -117,118 +93,82 @@ async function loadProducts() {
         collection(db, "products")
     );
 
-    snapshot.forEach((product) => {
+    snapshot.forEach(product => {
 
         const data = product.data();
 
         adminProducts.innerHTML += `
 
-            <div class="product">
+<div class="product">
 
-    <img
-        src="${data.image}"
-        alt="${data.title}"
-    >
+<img src="${data.image}">
 
-    <h3>${data.title}</h3>
+<h3>${data.title}</h3>
 
-    <p>$${data.price}</p>
+<p>$${data.price}</p>
 
-    <a href="${data.link}" target="_blank">
-        🛒 Buy Now
-    </a>
-    <small>${data.category}</small>
+<a href="${data.link}" target="_blank">
+🛒 Buy Now
+</a>
 
-    <br><br>
+<br><br>
 
-    <button class="delete-btn" data-id="${product.id}">
-        Delete
-    </button>
+<button class="edit-btn"
+data-id="${product.id}">
+Edit
+</button>
 
-    <button class="edit-btn" data-id="${product.id}">
-        Edit
-    </button>
-
+<button class="delete-btn"
+data-id="${product.id}">
+Delete
+</button>
 </div>
 
-        `;
+`;
 
     });
 
-console.log("Delete buttons activated");
-document.querySelectorAll(".delete-btn").forEach(button => {
+    document.querySelectorAll(".delete-btn").forEach(btn => {
 
-    button.onclick = async () => {
+        btn.onclick = async () => {
 
-        if (!confirm("Delete this product?")) return;
+            if (!confirm("Delete Product?")) return;
 
-        await deleteDoc(
-            doc(db, "products", button.dataset.id)
-        );
+            await deleteDoc(
+                doc(db, "products", btn.dataset.id)
+            );
 
-        loadProducts();
+            loadProducts();
 
-    };
+        };
 
-});
-document.querySelectorAll(".edit-btn").forEach(button => {
+    });
 
-    button.onclick = async () => {
+    document.querySelectorAll(".edit-btn").forEach(btn => {
 
-        editingId = button.dataset.id;
+        btn.onclick = async () => {
 
-        const snapshot = await getDocs(collection(db, "products"));
+            editingId = btn.dataset.id;
 
-        snapshot.forEach((product) => {
+            const snap = await getDoc(
+                doc(db, "products", editingId)
+            );
 
-            if (product.id === editingId) {
+            const data = snap.data();
 
-                const data = product.data();
+            title.value = data.title;
+            price.value = data.price;
+            image.value = data.image;
+            category.value = data.category;
+            link.value = data.link;
+            description.value = data.description;
 
-                document.getElementById("title").value = data.title;
-                document.getElementById("price").value = data.price;
-                document.getElementById("image").value = data.image;
-                document.getElementById("category").value = data.category;
-                document.getElementById("link").value = data.link;
-                document.getElementById("description").value = data.description;
+        };
 
-            }
+    });
 
-        });
 
-    };
-
-});
-
-}
 
 loadProducts();
-
-async function loadDashboard() {
-
-    const productsSnapshot = await getDocs(collection(db, "products"));
-    totalProducts.textContent = productsSnapshot.size;
-
-    const ordersSnapshot = await getDocs(collection(db, "orders"));
-
-    totalOrders.textContent = ordersSnapshot.size;
-
-    let pending = 0;
-    let completed = 0;
-    let cancelled = 0;
-
-    ordersSnapshot.forEach(order => {
-
-        const status = order.data().status || "Pending";
-
-        if (status === "Pending") pending++;
-        if (status === "Completed") completed++;
-        if (status === "Cancelled") cancelled++;
-
-    });
-
-    pendingOrders.textContent = pending;
-    completedOrders.textContent = completed;
-    cancelledOrders.textContent = cancelled;
 
 }
