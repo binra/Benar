@@ -529,3 +529,16 @@ header{
 }
 
 }
+/* Featured Products */
+
+.featured{
+    padding:40px 20px;
+}
+
+.section-title{
+    text-align:center;
+    font-size:32px;
+    margin-bottom:30px;
+    color:#222;
+    font-weight:700;
+}

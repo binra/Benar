@@ -97,6 +97,50 @@ searchInput.addEventListener("keyup", () => {
 
 });
 
+// ======================
+// Featured Products
+// ======================
+
+async function loadFeaturedProducts() {
+
+    const featuredContainer = document.getElementById("featuredProducts");
+
+    if (!featuredContainer) return;
+
+    featuredContainer.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "products"));
+
+    snapshot.forEach((product) => {
+
+        const data = product.data();
+
+        if (!data.featured) return;
+
+        featuredContainer.innerHTML += `
+
+        <div class="product">
+
+            <span class="favorite">⭐</span>
+
+            <img src="${data.image}" alt="${data.title}">
+
+            <h2>${data.title}</h2>
+
+            <p>$${data.price}</p>
+
+            <a href="${data.link}" target="_blank" class="buy-btn">
+                Buy Now
+            </a>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
 // Category Filter
 
 function activateCategoryFilter() {
@@ -188,3 +232,4 @@ if (nextBtn && prevBtn && slides.length > 0) {
     setInterval(nextSlide, 4000);
 
 }
+loadFeaturedProducts();
