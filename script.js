@@ -18,6 +18,8 @@ async function loadProducts() {
 
         const data = product.data();
 
+        if (!data.featured) return;
+
         productsContainer.innerHTML += `
             <div class="product" data-category="${data.category}">
 
@@ -129,5 +131,60 @@ function activateCategoryFilter() {
         };
 
     });
+
+}
+// ======================
+// Hero Slider
+// ======================
+
+const slides = document.querySelectorAll(".slide");
+const nextBtn = document.querySelector(".next");
+const prevBtn = document.querySelector(".prev");
+
+let currentSlide = 0;
+
+function showSlide(index) {
+
+    slides.forEach(slide => slide.classList.remove("active"));
+
+    slides[index].classList.add("active");
+
+}
+
+function nextSlide() {
+
+    currentSlide++;
+
+    if (currentSlide >= slides.length) {
+
+        currentSlide = 0;
+
+    }
+
+    showSlide(currentSlide);
+
+}
+
+function prevSlide() {
+
+    currentSlide--;
+
+    if (currentSlide < 0) {
+
+        currentSlide = slides.length - 1;
+
+    }
+
+    showSlide(currentSlide);
+
+}
+
+if (nextBtn && prevBtn && slides.length > 0) {
+
+    nextBtn.onclick = nextSlide;
+
+    prevBtn.onclick = prevSlide;
+
+    setInterval(nextSlide, 4000);
 
 }

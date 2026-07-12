@@ -22,7 +22,7 @@ await signInWithEmailAndPassword(auth, email, password);
 
 const form = document.getElementById("productForm");
 const adminProducts = document.getElementById("adminProducts");
-
+const featured = document.getElementById("featured");
 
 let editingId = null;
 
@@ -43,9 +43,12 @@ form.addEventListener("submit", async (e) => {
 
         link: link.value,
 
-        description: description.value
+        description: description.value,
+       
+        featured: featured.checked,
 
     };
+
 
     if (!product.link) {
 
