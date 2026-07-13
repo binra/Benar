@@ -190,6 +190,50 @@ async function loadBestDeals() {
 
 }
 
+// ======================
+// New Arrivals
+// ======================
+
+async function loadNewArrivals() {
+
+    const newArrivals = document.getElementById("newArrivals");
+
+    if (!newArrivals) return;
+
+    newArrivals.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "products"));
+
+    snapshot.forEach((product) => {
+
+        const data = product.data();
+
+        if (!data.newArrival) return;
+
+        newArrivals.innerHTML += `
+
+        <div class="product">
+
+            <img src="${data.image}" alt="${data.title}">
+
+            <h2>${data.title}</h2>
+
+            <p>$${data.price}</p>
+
+            <a href="${data.link}" target="_blank" class="buy-btn">
+
+                🛒 Shop Now
+
+            </a>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
 // Category Filter
 
 function activateCategoryFilter() {
@@ -284,3 +328,5 @@ if (nextBtn && prevBtn && slides.length > 0) {
 loadFeaturedProducts();
 
 loadBestDeals();
+
+loadNewArrivals();

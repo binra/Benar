@@ -24,6 +24,7 @@ const form = document.getElementById("productForm");
 const adminProducts = document.getElementById("adminProducts");
 const featured = document.getElementById("featured");
 const bestDeal = document.getElementById("bestDeal");
+const newArrival = document.getElementById("newArrival");
 let editingId = null;
 
 
@@ -48,6 +49,8 @@ form.addEventListener("submit", async (e) => {
         featured: featured.checked,
 
         bestDeal: bestDeal.checked,
+
+        newArrival: newArrival.checked,
     };
 
 
@@ -166,6 +169,9 @@ Delete
             category.value = data.category;
             link.value = data.link;
             description.value = data.description;
+            featured.checked = data.featured || false;
+            bestDeal.checked = data.bestDeal || false;
+            newArrival.checked = data.newArrival || false;
 
         };
 
