@@ -26,10 +26,15 @@ const featured = document.getElementById("featured");
 const bestDeal = document.getElementById("bestDeal");
 const newArrival = document.getElementById("newArrival");
 const description = document.getElementById("description");
+const title = document.getElementById("title");
+const price = document.getElementById("price");
+const image = document.getElementById("image");
+const category = document.getElementById("category");
+const link = document.getElementById("link");
 let editingId = null;
 
 
-console.log(product);
+
 form.addEventListener("submit", async (e) => {
 
     e.preventDefault();
