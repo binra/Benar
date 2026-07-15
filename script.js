@@ -7,127 +7,236 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const productsContainer = document.getElementById("products");
-const featuredContainer = document.getElementById("featuredProducts");
-const bestDealsContainer = document.getElementById("bestDeals");
-const newArrivalsContainer = document.getElementById("newArrivals");
-const searchInput = document.getElementById("searchInput");
 
-// ======================
-// Card template (used everywhere so every section looks the same)
-// ======================
-
-function productCard(id, data) {
-
-    return `
-        <div class="product" data-category="${data.category}" data-id="${id}">
-
-            <div class="badge">
-                🔥 HOT DEAL
-            </div>
-
-            <div class="discount">
-                -30%
-            </div>
-
-            <div class="wishlist">
-                ❤️
-            </div>
-            <div class="favorite">♡</div>
-
-            <a href="product.html?id=${id}">
-                <img src="${data.image}" alt="${data.title}">
-            </a>
-
-            <h2>${data.title}</h2>
-
-            <div class="rating">
-                ⭐ ${data.rating || 0}
-                <span>(${data.reviews || 0} Reviews)</span>
-            </div>
-
-            ${data.description ? `<p class="product-desc">${data.description}</p>` : ""}
-
-            <p class="price">$${data.price}</p>
-
-            <p class="shipping">🚚 Free Shipping</p>
-
-            <a href="${data.link}" target="_blank" rel="noopener noreferrer" class="buy-btn">
-                🔥 Get Best Price
-            </a>
-
-        </div>
-    `;
-
-}
-
-// ======================
-// Load + sort every product into exactly ONE section
-// Priority: Featured > Best Deal > New Arrival > main list
-// ======================
-
-async function loadAllProducts() {
+async function loadProducts() {
 
     productsContainer.innerHTML = "";
-    if (featuredContainer) featuredContainer.innerHTML = "";
-    if (bestDealsContainer) bestDealsContainer.innerHTML = "";
-    if (newArrivalsContainer) newArrivalsContainer.innerHTML = "";
 
     const snapshot = await getDocs(collection(db, "products"));
 
     snapshot.forEach((product) => {
 
         const data = product.data();
-        const card = productCard(product.id, data);
 
-        // Every product always shows in the main list
-        productsContainer.innerHTML += card;
+        const container =
+            data.featured
+                ? document.getElementById("featuredProducts")
+                : document.getElementById("products");
 
-        // Independently, it can also show in any of the special sections
-        if (data.featured && featuredContainer) {
-            featuredContainer.innerHTML += card;
-        }
+        if (!container) return;
 
-        if (data.bestDeal && bestDealsContainer) {
-            bestDealsContainer.innerHTML += card;
-        }
+        container.innerHTML += `
+            <div class="product" data-category="${data.category}">
 
-        if (data.newArrival && newArrivalsContainer) {
-            newArrivalsContainer.innerHTML += card;
-        }
+                <div class="badge">
+                    🔥 HOT DEAL
+                </div>
+                
+                <div class="discount">
+                    -30%
+                </div>
+                <div class="wishlist">
+                    ❤️
+                </div>
+                <div class="favorite">♡</div>
+
+                <a href="product.html?id=${product.id}">
+                    <img src="${data.image}" alt="${data.title}">
+                </a>
+
+                <h2>${data.title}</h2>
+
+                <div class="rating">
+
+                    ⭐ ${data.rating || 0}
+
+                    <span>
+                        (${data.reviews || 0} Reviews)
+                    </span>
+
+                </div>
+                
+                <p class="price">$${data.price}</p>
+
+                <p class="shipping">
+
+                🚚 Free Shipping
+
+                </p>
+
+                <a href="${data.link}" target="_blank" class="buy-btn">
+
+                🔥 Get Best Price
+
+                </a>
+
+            </div>
+        `;
 
     });
+
 
     activateCategoryFilter();
 
+
 }
 
-// ======================
+loadProducts();
 // Search
+
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("keyup", () => {
+
+    const value = searchInput.value.toLowerCase();
+
+    document.querySelectorAll(".product").forEach(product => {
+
+        const title = product.querySelector("h2").textContent.toLowerCase();
+
+        if (title.includes(value)) {
+            product.style.display = "block";
+        } else {
+            product.style.display = "none";
+        }
+
+    });
+
+});
+
+// ======================
+// Featured Products
 // ======================
 
-if (searchInput) {
+async function loadFeaturedProducts() {
 
-    searchInput.addEventListener("keyup", () => {
+    const featuredContainer = document.getElementById("featuredProducts");
 
-        const value = searchInput.value.toLowerCase();
+    if (!featuredContainer) return;
 
-        document.querySelectorAll(".product").forEach(product => {
+    featuredContainer.innerHTML = "";
 
-            const title = product.querySelector("h2").textContent.toLowerCase();
+    const snapshot = await getDocs(collection(db, "products"));
 
-            product.style.display = title.includes(value) ? "block" : "none";
+    snapshot.forEach((product) => {
 
-        });
+        const data = product.data();
+
+        if (!data.featured) return;
+
+        featuredContainer.innerHTML += `
+
+        <div class="product">
+
+            <span class="favorite">⭐</span>
+
+            <img src="${data.image}" alt="${data.title}">
+
+            <h2>${data.title}</h2>
+
+            <p>$${data.price}</p>
+
+            <a href="${data.link}" target="_blank" class="buy-btn">
+                Buy Now
+            </a>
+
+        </div>
+
+        `;
 
     });
 
 }
 
 // ======================
-// Category Filter (only applies to the main product grid)
+// Best Deals
 // ======================
 
+async function loadBestDeals() {
 
+    const bestDeals = document.getElementById("bestDeals");
+
+    if (!bestDeals) return;
+
+    bestDeals.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "products"));
+
+    snapshot.forEach((product) => {
+
+        const data = product.data();
+
+        if (!data.bestDeal) return;
+
+        bestDeals.innerHTML += `
+
+        <div class="product">
+
+            <img src="${data.image}" alt="${data.title}">
+
+            <h2>${data.title}</h2>
+
+            <p>$${data.price}</p>
+
+            <a href="${data.link}" target="_blank" class="buy-btn">
+
+                🔥 Get Best Price
+
+            </a>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+// ======================
+// New Arrivals
+// ======================
+
+async function loadNewArrivals() {
+
+    const newArrivals = document.getElementById("newArrivals");
+
+    if (!newArrivals) return;
+
+    newArrivals.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "products"));
+
+    snapshot.forEach((product) => {
+
+        const data = product.data();
+
+        if (!data.newArrival) return;
+
+        newArrivals.innerHTML += `
+
+        <div class="product">
+
+            <img src="${data.image}" alt="${data.title}">
+
+            <h2>${data.title}</h2>
+
+            <p>$${data.price}</p>
+
+            <a href="${data.link}" target="_blank" class="buy-btn">
+
+                🛒 Shop Now
+
+            </a>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+// Category Filter
 
 function activateCategoryFilter() {
 
@@ -141,9 +250,13 @@ function activateCategoryFilter() {
 
             const category = filter.dataset.filter;
 
-            document.querySelectorAll("#products .product").forEach(product => {
+            document.querySelectorAll(".product").forEach(product => {
 
-                if (category === "all" || product.dataset.category === category) {
+                if (
+                    category === "all" ||
+                    product.dataset.category === category
+                ) {
+
                     product.style.display = "block";
 
                 } else {
@@ -179,13 +292,29 @@ function showSlide(index) {
 }
 
 function nextSlide() {
-    currentSlide = (currentSlide + 1) % slides.length;
+
+    currentSlide++;
+
+    if (currentSlide >= slides.length) {
+
+        currentSlide = 0;
+
+    }
+
     showSlide(currentSlide);
 
 }
 
 function prevSlide() {
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+
+    currentSlide--;
+
+    if (currentSlide < 0) {
+
+        currentSlide = slides.length - 1;
+
+    }
+
     showSlide(currentSlide);
 
 }
@@ -200,8 +329,7 @@ if (nextBtn && prevBtn && slides.length > 0) {
 
 }
 
-// ======================
-// Init
-// ======================
 
-loadAllProducts();
+loadBestDeals();
+
+loadNewArrivals();
