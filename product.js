@@ -33,15 +33,22 @@ async function loadProduct() {
     container.innerHTML = `
         <div class="product-details">
 
+        <div class="image-box">
+
+        ${data.bestSeller ? `
+
+        <div class="badge">
+
+        🏆 Best Seller
+
+        </div>
+
+        ` : ""}
             <img src="${data.image}" alt="${data.title}" class="main-image">
 
             <div class="details">
 
-            ${data.bestSeller ? `
-            <div class="badge">
-            🏆 Best Seller
-            </div>
-            ` : ""}
+
                 <h1>${data.title}</h1>
 
                 <div class="rating">
