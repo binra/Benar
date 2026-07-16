@@ -339,9 +339,7 @@ if (nextBtn && prevBtn && slides.length > 0) {
 
 }
 
-loadproducts();
-
-loadfeaturedproducts();
+loadFeaturedProducts();
 
 loadBestDeals();
 
