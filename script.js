@@ -210,6 +210,8 @@ async function loadNewArrivals() {
 
         const data = product.data();
 
+        console.log(data.title, data.newArrival);
+
         if (!data.newArrival) return;
 
         newArrivals.innerHTML += `
