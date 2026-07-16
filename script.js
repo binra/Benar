@@ -18,6 +18,12 @@ async function loadProducts() {
 
         const data = product.data();
 
+        console.log(
+            data.title,
+            "featured:", data.featured,
+            "bestDeal:", data.bestDeal,
+            "newArrival:", data.newArrival
+        );
         // Featured Products
         if (data.featured) return;
 
