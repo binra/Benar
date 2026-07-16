@@ -18,10 +18,7 @@ async function loadProducts() {
 
         const data = product.data();
 
-        const container =
-            data.featured
-                ? document.getElementById("featuredProducts")
-                : document.getElementById("products");
+        const container = document.getElementById("products");
 
         if (!container) return;
 
@@ -330,8 +327,7 @@ if (nextBtn && prevBtn && slides.length > 0) {
 
 }
 
-
-
+loadFeaturedProducts();
 
 loadBestDeals();
 
