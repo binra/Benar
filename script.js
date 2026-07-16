@@ -18,6 +18,15 @@ async function loadProducts() {
 
         const data = product.data();
 
+        // Featured Products
+        if (data.featured) return;
+
+        // Best Deals
+        if (data.bestDeal) return;
+
+        // New Arrivals
+        if (data.newArrival) return;
+
         const container = document.getElementById("products");
 
         if (!container) return;
@@ -327,7 +336,9 @@ if (nextBtn && prevBtn && slides.length > 0) {
 
 }
 
-loadFeaturedProducts();
+loadproducts();
+
+loadfeaturedproducts();
 
 loadBestDeals();
 
