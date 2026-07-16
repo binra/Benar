@@ -81,6 +81,7 @@ async function loadProducts() {
 
     });
 
+    console.log("Products:", productsContainer.children.length);
 
     activateCategoryFilter();
 
@@ -241,6 +242,7 @@ async function loadNewArrivals() {
 
     });
 
+    console.log("New Arrivals:", newArrivals.children.length);
 }
 
 // Category Filter
