@@ -47,6 +47,10 @@ async function loadWishlist() {
 
             </a>
 
+            <button class="remove-btn" data-id="${doc.id}">
+                ❌ Remove
+            </button>
+
         </div>
         `;
 
@@ -55,3 +59,19 @@ async function loadWishlist() {
 }
 
 loadWishlist();
+
+document.addEventListener("click", (e) => {
+
+    if (!e.target.classList.contains("remove-btn")) return;
+
+    const id = e.target.dataset.id;
+
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    wishlist = wishlist.filter(item => item !== id);
+
+    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+
+    loadWishlist();
+
+});

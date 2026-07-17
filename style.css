@@ -597,3 +597,28 @@ header{
     left:15px;
     z-index:10;
 }
+.remove-btn{
+
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#ff3b30;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+}
+
+.remove-btn:hover{
+
+    opacity:.9;
+
+}
