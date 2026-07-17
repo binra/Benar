@@ -21,7 +21,7 @@ const nextPageBtn = document.getElementById("nextPage");
 const pageNumber = document.getElementById("pageNumber");
 
 let currentPage = 1;
-const productsPerPage = 2;
+const productsPerPage = 12;
 
 // ======================
 // Product Card
