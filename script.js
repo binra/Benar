@@ -321,7 +321,7 @@ function initWishlist() {
         btn.addEventListener("click", () => {
 
             wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
+            
             if (wishlist.includes(id)) {
 
                 wishlist = wishlist.filter(item => item !== id);
@@ -336,9 +336,24 @@ function initWishlist() {
 
             localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
+            updateWishlistCount();
+
         });
 
     });
+
+}
+
+function updateWishlistCount() {
+
+    const count = document.getElementById("wishlistCount");
+
+    if (!count) return;
+
+    const wishlist =
+        JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    count.textContent = wishlist.length;
 
 }
 
@@ -347,3 +362,4 @@ function initWishlist() {
 // ======================
 
 loadAllProducts().then(initWishlist);
+updateWishlistCount();
