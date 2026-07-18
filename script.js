@@ -16,6 +16,7 @@ const productsContainer = document.getElementById("products");
 const featuredContainer = document.getElementById("featuredProducts");
 const bestDealsContainer = document.getElementById("bestDeals");
 const newArrivalsContainer = document.getElementById("newArrivals");
+const trendingContainer = document.getElementById("trendingProducts");
 
 const searchInput = document.getElementById("searchInput");
 const sortProducts = document.getElementById("sortProducts");
@@ -157,6 +158,9 @@ async function loadAllProducts() {
 
     clearSections();
 
+    if (trendingContainer)
+    trendingContainer.innerHTML = "";
+
     const snapshot = await getDocs(collection(db, "products"));
 
     let products = [];
@@ -201,6 +205,16 @@ async function loadAllProducts() {
     pageProducts.forEach((data) => {
 
         const card = productCard(data.id, data);
+
+        if ((data.clicks || 0) >= 10) {
+
+            if (trendingContainer) {
+
+                trendingContainer.innerHTML += card;
+
+            }
+
+        }
 
         // Featured Products
         if (data.featured) {
