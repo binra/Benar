@@ -73,6 +73,7 @@ const categoryIcon = document.getElementById("categoryIcon");
 const categoryList = document.getElementById("categoryList");
 
 let editingId = null;
+let editingCategoryId = null;
 
 // Save Product
 form.addEventListener("submit", async (e) => {
@@ -286,6 +287,12 @@ async function loadCategoryManager() {
             <h3>${data.icon} ${data.name}</h3>
 
             <button
+                class="edit-category"
+                data-id="${categoryDoc.id}">
+                Edit
+            </button>
+
+            <button
                 class="delete-category"
                 data-id="${categoryDoc.id}">
                 Delete
@@ -298,6 +305,29 @@ async function loadCategoryManager() {
     });
 
 }
+
+document.querySelectorAll(".edit-category").forEach(btn => {
+
+    btn.onclick = async () => {
+
+        editingCategoryId = btn.dataset.id;
+
+        const snap = await getDoc(
+            doc(db, "categories", editingCategoryId)
+        );
+
+        const data = snap.data();
+
+        categoryName.value = data.name;
+
+        categoryIcon.value = data.icon;
+
+        categoryForm.querySelector("button").textContent =
+            "Update Category";
+
+    };
+
+});
 
 loadProducts();
 loadCategories();
