@@ -23,6 +23,28 @@ await signInWithEmailAndPassword(auth, email, password);
 
 // Elements
 const form = document.getElementById("productForm");
+const categorySelect = document.getElementById("category");
+
+async function loadCategories() {
+
+    categorySelect.innerHTML =
+        `<option value="">Select Category</option>`;
+
+    const snapshot = await getDocs(collection(db, "categories"));
+
+    snapshot.forEach((doc) => {
+
+        const data = doc.data();
+
+        categorySelect.innerHTML += `
+        <option value="${data.name}">
+            ${data.icon} ${data.name}
+        </option>
+        `;
+
+    });
+
+}
 
 
 const title = document.getElementById("title");
@@ -216,3 +238,4 @@ async function loadProducts() {
 }
 
 loadProducts();
+loadCategories();
