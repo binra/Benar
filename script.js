@@ -349,6 +349,9 @@ if (searchInput) {
 const dynamicCategories =
     document.getElementById("dynamicCategories");
 
+const dynamicMoreCategories =
+    document.getElementById("dynamicMoreCategories");
+
 async function loadCategoriesMenu() {
 
     if (!dynamicCategories) return;
@@ -373,6 +376,45 @@ async function loadCategoriesMenu() {
 </a>
 
 `;
+
+        }
+
+    });
+
+}
+
+async function loadMoreCategoriesMenu() {
+
+    if (!dynamicMoreCategories) return;
+
+    dynamicMoreCategories.innerHTML = "";
+
+    const snapshot = await getDocs(
+        collection(db, "categories")
+    );
+
+    let count = 0;
+
+    snapshot.forEach((categoryDoc) => {
+
+        const data = categoryDoc.data();
+
+        if (data.active !== false) {
+
+            count++;
+
+            if (count > 4) {
+
+                dynamicMoreCategories.innerHTML += `
+
+<a href="#"
+   data-filter="${data.name}">
+   ${data.icon} ${data.name}
+</a>
+
+`;
+
+            }
 
         }
 
@@ -553,6 +595,8 @@ function loadRecentlyViewed() {
 // ======================
 
 loadCategoriesMenu();
+
+loadMoreCategoriesMenu();
 
 loadAllProducts().then(initWishlist);
 updateWishlistCount();
