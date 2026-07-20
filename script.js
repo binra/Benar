@@ -346,6 +346,40 @@ if (searchInput) {
 // Category Filter
 // ======================
 
+const dynamicCategories =
+    document.getElementById("dynamicCategories");
+
+async function loadCategoriesMenu() {
+
+    if (!dynamicCategories) return;
+
+    dynamicCategories.innerHTML = "";
+
+    const snapshot = await getDocs(
+        collection(db, "categories")
+    );
+
+    snapshot.forEach((categoryDoc) => {
+
+        const data = categoryDoc.data();
+
+        if (data.active !== false) {
+
+            dynamicCategories.innerHTML += `
+
+<a href="#"
+   data-filter="${data.name}">
+   ${data.icon} ${data.name}
+</a>
+
+`;
+
+        }
+
+    });
+
+}
+
 function activateCategoryFilter() {
 
     const filters = document.querySelectorAll(".menu a, .dropdown-content a");
@@ -517,6 +551,8 @@ function loadRecentlyViewed() {
 // ======================
 // Init
 // ======================
+
+loadCategoriesMenu();
 
 loadAllProducts().then(initWishlist);
 updateWishlistCount();
