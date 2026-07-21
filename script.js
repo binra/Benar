@@ -451,57 +451,7 @@ async function loadMoreCategoriesMenu() {
 
 }
 
-async function loadBanners() {
 
-    if (!dynamicBanners) return;
-
-    dynamicBanners.innerHTML = "";
-
-    const snapshot = await getDocs(
-
-        query(
-
-            collection(db, "banners"),
-
-            orderBy("order")
-
-        )
-
-    );
-
-    snapshot.forEach((bannerDoc) => {
-
-        const data = bannerDoc.data();
-
-        if (data.active !== false) {
-
-            dynamicBanners.innerHTML += `
-
-<div class="slide">
-
-    <img src="${data.image}" alt="${data.title}">
-
-    <div class="hero-content">
-
-        <h1>${data.title}</h1>
-
-        <a href="${data.link}" class="hero-btn">
-
-            Shop Now
-
-        </a>
-
-    </div>
-
-</div>
-
-`;
-
-        }
-
-    });
-
-}
 
 function activateCategoryFilter() {
 
