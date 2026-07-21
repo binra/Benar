@@ -5,7 +5,9 @@ import {
     getDocs,
     doc,
     updateDoc,
-    increment
+    increment,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 // ======================
@@ -359,7 +361,15 @@ async function loadCategoriesMenu() {
     dynamicCategories.innerHTML = "";
 
     const snapshot = await getDocs(
-        collection(db, "categories")
+
+        query(
+
+            collection(db, "categories"),
+
+            orderBy("order")
+
+        )
+
     );
 
     let count = 0;
@@ -398,7 +408,15 @@ async function loadMoreCategoriesMenu() {
     dynamicMoreCategories.innerHTML = "";
 
     const snapshot = await getDocs(
-        collection(db, "categories")
+
+        query(
+
+            collection(db, "categories"),
+
+            orderBy("order")
+
+        )
+
     );
 
     let count = 0;
