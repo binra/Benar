@@ -72,6 +72,21 @@ const categoryIcon = document.getElementById("categoryIcon");
 
 const categoryList = document.getElementById("categoryList");
 
+const bannerForm =
+    document.getElementById("bannerForm");
+
+const bannerTitle =
+    document.getElementById("bannerTitle");
+
+const bannerImage =
+    document.getElementById("bannerImage");
+
+const bannerLink =
+    document.getElementById("bannerLink");
+
+const bannerList =
+    document.getElementById("bannerList");
+
 let editingId = null;
 let editingCategoryId = null;
 
@@ -174,6 +189,30 @@ categoryForm.addEventListener("submit", async (e) => {
     loadCategories();
 
     loadCategoryManager();
+
+});
+
+bannerForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    await addDoc(collection(db, "banners"), {
+
+        title: bannerTitle.value.trim(),
+
+        image: bannerImage.value.trim(),
+
+        link: bannerLink.value.trim(),
+
+        active: true,
+
+        order: Date.now()
+
+    });
+
+    bannerForm.reset();
+
+    loadBannerManager();
 
 });
 
@@ -329,6 +368,36 @@ async function loadCategoryManager() {
 
     });
 
+async function loadBannerManager() {
+
+    if (!bannerList) return;
+
+    bannerList.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "banners"));
+
+    snapshot.forEach((bannerDoc) => {
+
+        const data = bannerDoc.data();
+
+        bannerList.innerHTML += `
+
+        <div class="product">
+
+            <img src="${data.image}" style="width:100%;max-width:250px;">
+
+            <h3>${data.title}</h3>
+
+            <p>${data.link}</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
     // Edit Category
     document.querySelectorAll(".edit-category").forEach(btn => {
 
@@ -381,3 +450,4 @@ async function loadCategoryManager() {
 loadProducts();
 loadCategories();
 loadCategoryManager();
+loadBannerManager();
