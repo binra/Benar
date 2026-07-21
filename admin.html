@@ -4,225 +4,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Benar</title>
+    <title>Admin Panel - Novexa</title>
 
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-box button:hover {
+            background: #764ba2;
+        }
+
+        .login-error {
+            color: #d32f2f;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .login-loading {
+            text-align: center;
+            color: #667eea;
+        }
+
+        #adminPanel {
+            display: none;
+        }
+
+        .logout-btn {
+            background: #d32f2f !important;
+            padding: 10px 20px !important;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            margin-top: 10px;
+        }
+
+        .logout-btn:hover {
+            background: #b71c1c !important;
+        }
+    </style>
+
 </head>
 
 <body>
 
-<header>
-
-    <div class="logo">
-
-        <a href="index.html">
-            <img src="images/logo.png" alt="Logo">
-        </a>
-
-        <h1>Admin Panel</h1>
-
-    </div>
-
-</header>
-
-<main class="admin-page">
-
-    <h2>Add New Product</h2>
-
-    <input type="hidden" id="productId">
-    
-    <div class="dashboard-cards">
-
-    <div class="card">
-        <h3>Total Products</h3>
-        <h2 id="totalProducts">0</h2>
-    </div>
-
-    <div class="card">
-        <h3>Featured Products</h3>
-        <h2 id="featuredProducts">0</h2>
-    </div>
-
-    <div class="card">
-        <h3>Best Deals</h3>
-        <h2 id="bestDeals">0</h2>
-    </div>
-
-    <div class="card">
-        <h3>Best Sellers</h3>
-        <h2 id="bestSellers">0</h2>
-    </div>
-
-    </div>
-
-    <form id="productForm">
-
-        <input
-            type="text"
-            id="title"
-            placeholder="Product Name"
-            required
+<!-- Login Form -->
+<div id="loginContainer" class="login-container">
+    <div class="login-box">
+        <h1>Admin Login</h1>
+        <input 
+            type="email" 
+            id="loginEmail" 
+            placeholder="Email"
+            autocomplete="email"
         >
-
-        <input
-            type="number"
-            id="price"
-            placeholder="Price"
-            required
+        <input 
+            type="password" 
+            id="loginPassword" 
+            placeholder="Password"
+            autocomplete="current-password"
         >
+        <button onclick="handleLogin()">Login</button>
+        <div id="loginMessage"></div>
+    </div>
+</div>
 
-        <input
-            type="text"
-            id="image"
-            placeholder="Image Path"
-            required
-        >
+<!-- Admin Panel -->
+<div id="adminPanel">
 
-        <select id="category" required>
+    <header>
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" alt="Logo">
+            </a>
+            <h1>Admin Panel</h1>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </header>
 
-            <option value="">Select Category</option>
+    <main class="admin-page">
 
-        </select>
+        <h2>Add New Product</h2>
+
+        <input type="hidden" id="productId">
         
-        <label>
+        <form id="productForm">
 
+            <input
+                type="text"
+                id="title"
+                placeholder="Product Name"
+                required
+            >
+
+            <input
+                type="number"
+                id="price"
+                placeholder="Price"
+                required
+            >
+
+            <input
+                type="number"
+                id="originalPrice"
+                placeholder="Original Price (optional, for discount)"
+            >
+
+            <input
+                type="text"
+                id="image"
+                placeholder="Image Path"
+                required
+            >
+
+            <input
+                type="text"
+                id="category"
+                placeholder="Category"
+                required
+            >
             
-
-        <label>
-
-            <input type="checkbox" id="bestDeal">
-
-             Best Deal
-
-        </label>
-
-        <label>
-
-            <input type="checkbox" id="newArrival">
-
-             New Arrival
-
-        </label>
-
-        <label>
-            <input type="checkbox" id="bestSeller">
-            Best Seller
-        </label>
-        <input
-            type="text"
-            id="link"
-            placeholder="Amazon Affiliate Link"
-            required
-        >
-        
-        <div class="form-group">
-
             <label>
-
                 <input type="checkbox" id="featured">
-
                 Featured Product
-
             </label>
 
-        </div>
+            <label>
+                <input type="checkbox" id="bestDeal">
+                Best Deal
+            </label>
 
-        <textarea
-            id="description"
-            placeholder="Description"
-            rows="5"
-        ></textarea>
+            <label>
+                <input type="checkbox" id="newArrival">
+                New Arrival
+            </label>
 
-        <input
-        type="number"
-        id="rating"
-        placeholder="Rating (0 - 5)"
-        step="0.1"
-        min="0"
-        max="5"
-        >
+            <label>
+                <input type="checkbox" id="bestSeller">
+                Best Seller
+            </label>
 
-        <input
-        type="number"
-        id="reviews"
-        placeholder="Reviews Count"
-        min="0"
-        >
-        <button type="submit">
-            Add Product
-        </button>
+            <input
+                type="text"
+                id="link"
+                placeholder="Amazon Affiliate Link"
+                required
+            >
+            
+            <textarea
+                id="description"
+                placeholder="Description"
+                rows="5"
+            ></textarea>
 
-    </form>
+            <input
+                type="number"
+                id="rating"
+                placeholder="Rating (0 - 5)"
+                step="0.1"
+                min="0"
+                max="5"
+            >
 
-    
-<hr>
+            <input
+                type="number"
+                id="reviews"
+                placeholder="Reviews Count"
+                min="0"
+            >
 
-<h2>Category Manager</h2>
+            <button type="submit">
+                Add Product
+            </button>
 
-<form id="categoryForm">
+        </form>
 
-    <input
-        type="text"
-        id="categoryName"
-        placeholder="Category Name"
-        required
-    >
+        
+        <hr>
 
-    <input
-        type="text"
-        id="categoryIcon"
-        placeholder="Icon (📱)"
-        required
-    >
+        <h2>Products</h2>
 
-    <button type="submit">
-        Add Category
-    </button>
+        <div id="adminProducts"></div>
 
-</form>
+        <hr>
 
-<div id="categoryList"></div>
+        <h2>Category Manager</h2>
 
-<hr>
+        <form id="categoryForm">
 
-<h2>Banner Manager</h2>
+            <input
+                type="text"
+                id="categoryName"
+                placeholder="Category Name"
+                required
+            >
 
-<form id="bannerForm">
+            <input
+                type="text"
+                id="categoryIcon"
+                placeholder="Icon (emoji or text)"
+                required
+            >
 
-    <input
-        type="text"
-        id="bannerTitle"
-        placeholder="Banner Title"
-        required
-    >
+            <button type="submit">
+                Add Category
+            </button>
 
-    <input
-        type="text"
-        id="bannerImage"
-        placeholder="Banner Image URL"
-        required
-    >
+        </form>
 
-    <input
-        type="text"
-        id="bannerLink"
-        placeholder="Banner Link"
-    >
+        <div id="categoryList"></div>
 
-    <button type="submit">
+    </main>
 
-        Add Banner
-
-    </button>
-
-</form>
-
-<div id="bannerList"></div>
-
-<h2>Products</h2>
-
-<div id="adminProducts"></div>
-</main>
+</div>
 
 <script type="module" src="admin.js"></script>
 
