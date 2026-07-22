@@ -12,7 +12,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 import {
-    onAuthStateChanged
+    onAuthStateChanged,
+    signout
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
 const ADMIN_EMAIL = "benar4700@gmail.com";
@@ -571,3 +572,16 @@ loadProducts();
 loadCategories();
 loadCategoryManager();
 loadBannerManager();
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+
+    logoutBtn.addEventListener("click", async () => {
+
+        await signOut(auth);
+
+        window.location.href = "login.html";
+
+    });
+
+}
