@@ -297,6 +297,19 @@ async function loadProducts() {
 
         const data = productDoc.data();
 
+        const search = adminSearch.value.toLowerCase();
+
+        const filter = adminFilter.value;
+
+        if (
+            !data.title.toLowerCase().includes(search)
+        ) return;
+
+        if (
+            filter !== "all" &&
+            !data[filter]
+        ) return;
+
         total++;
 
         if(data.featured) featuredCount++;
@@ -631,6 +644,10 @@ loadCategories();
 loadCategoryManager();
 loadBannerManager();
 loadTopProducts();
+adminSearch.addEventListener("input", loadProducts);
+
+adminFilter.addEventListener("change", loadProducts);
+
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
