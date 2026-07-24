@@ -187,6 +187,14 @@ function clearSections() {
 
 async function loadAllProducts() {
 
+    const response = await fetch(
+      "https://quiet-haze-9edd.benarkalarey.workers.dev/?keywords=phone"
+    );
+
+    const apiData = await response.json();
+
+    console.log("AliExpress:", apiData);
+
     clearSections();
 
     if (trendingContainer)
@@ -194,28 +202,28 @@ async function loadAllProducts() {
 
     // const snapshot = await getDocs(collection(db, "products"));
 
-    const response = await fetch(
-        "https://quiet-haze-9edd.benarkalarey.workers.dev/?keywords=phone"
-    );
+    let products = apiData.aliexpress_affiliate_product_query_response
+      ?.resp_result
+      ?.result
+      ?.products
+      ?.product || [];
 
-    const data = await response.json();
+    products = products.map(item => ({
+        id: item.product_id,
+        title: item.product_title,
+        image: item.product_main_image_url,
+        price: parseFloat(item.target_sale_price),
+        link: item.promotion_link,
+        rating: item.evaluate_rate || "0",
+        reviews: item.lastest_volume || 0,
+        category: item.first_level_category_name || "All",
+        featured: true,
+        bestDeal: true,
+        newArrival: true,
+        clicks: 0
+    }));
 
-    console.log(data);
-    
-    let products = [];
-
-    snapshot.forEach((product) => {
-
-        products.push({
-            id: product.id,
-            ...product.data()
-        });
-
-    });
-
-    const popularProducts = [...products]
-        .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
-        .slice(0, 8);
+    const popularProducts = [...products].slice(0, 8);
 
     if (sortProducts) {
 
@@ -244,6 +252,8 @@ async function loadAllProducts() {
     const end = start + productsPerPage;
 
     const pageProducts = products.slice(start, end);
+
+    console.log("Products loaded:", pageProducts);
 
     if (popularContainer) {
 
@@ -718,6 +728,12 @@ loadMoreCategoriesMenu();
 loadBanners();
 
 loadAllProducts().then(initWishlist);
+
+fetch("https://quiet-haze-9edd.benarkalarey.workers.dev/?keywords=phone")
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
+
 updateWishlistCount();
 
 if (sortProducts) {
