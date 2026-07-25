@@ -131,7 +131,7 @@ function saveWishlist() {
 
 function initWishlist() {
 
-    document.querySelectorAll(".wishlist-btn").forEach(btn => {
+    document.querySelectorAll(".favorite").forEach(btn => {
 
         const id = btn.dataset.id;
 
@@ -142,8 +142,24 @@ function initWishlist() {
         if (isSaved) {
 
             btn.classList.add("active");
+            btn.textContent = "♥";
+
+        } else {
+
+            btn.classList.remove("active");
+            btn.textContent = "♡";
 
         }
+
+        // Remove any previously attached listener before adding a new one
+        btn.replaceWith(btn.cloneNode(true));
+
+    });
+
+    // Re-select after cloning, then attach fresh listeners
+    document.querySelectorAll(".favorite").forEach(btn => {
+
+        const id = btn.dataset.id;
 
         btn.addEventListener("click", () => {
 
@@ -158,6 +174,7 @@ function initWishlist() {
                 );
 
                 btn.classList.remove("active");
+                btn.textContent = "♡";
 
             } else {
 
@@ -173,6 +190,7 @@ function initWishlist() {
                     });
 
                     btn.classList.add("active");
+                    btn.textContent = "♥";
 
                 }
 
@@ -185,6 +203,7 @@ function initWishlist() {
     });
 
 }
+
 
 
 // ======================
