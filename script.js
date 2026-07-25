@@ -131,43 +131,61 @@ function saveWishlist() {
 
 function initWishlist() {
 
-    document.querySelectorAll(".favorite").forEach(btn => {
+    document.querySelectorAll(".wishlist-btn").forEach(btn => {
 
         const id = btn.dataset.id;
 
-        if (wishlist.includes(id)) {
+        const isSaved = wishlist.some(item =>
+            (typeof item === "object" ? item.id : item) === id
+        );
 
-            btn.textContent = "♥";
+        if (isSaved) {
 
-        } else {
-
-            btn.textContent = "♡";
+            btn.classList.add("active");
 
         }
 
-        btn.onclick = () => {
+        btn.addEventListener("click", () => {
 
-            if (wishlist.includes(id)) {
+            const alreadySaved = wishlist.some(item =>
+                (typeof item === "object" ? item.id : item) === id
+            );
 
-                wishlist = wishlist.filter(x => x !== id);
+            if (alreadySaved) {
 
-                btn.textContent = "♡";
+                wishlist = wishlist.filter(item =>
+                    (typeof item === "object" ? item.id : item) !== id
+                );
+
+                btn.classList.remove("active");
 
             } else {
 
-                wishlist.push(id);
+                const product = allProducts.find(p => String(p.id) === String(id));
 
-                btn.textContent = "♥";
+                if (product) {
+
+                    wishlist.push({
+                        id: String(id),
+                        title: product.title,
+                        image: product.image,
+                        price: product.price
+                    });
+
+                    btn.classList.add("active");
+
+                }
 
             }
 
             saveWishlist();
 
-        };
+        });
 
     });
 
 }
+
 
 // ======================
 // Recently Viewed

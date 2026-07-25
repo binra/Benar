@@ -7,7 +7,7 @@ import {
 
 const container = document.getElementById("wishlistProducts");
 
-async function loadWishlist() {
+function loadWishlist() {
 
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
@@ -24,30 +24,29 @@ async function loadWishlist() {
         return;
     }
 
-    const snapshot = await getDocs(collection(db, "products"));
+    wishlist.forEach((item) => {
 
-    snapshot.forEach((doc) => {
-
-        if (!wishlist.includes(doc.id)) return;
-
-        const data = doc.data();
+        // Support both old format (just an id string) and new format (full object)
+        const id = typeof item === "object" ? item.id : item;
+        const title = typeof item === "object" ? item.title : "Product";
+        const image = typeof item === "object" ? item.image : "";
+        const price = typeof item === "object" ? item.price : 0;
 
         container.innerHTML += `
         <div class="product">
 
-            <img src="${data.image}" alt="${data.title}">
+            <img src="${image}" alt="${title}">
 
-            <h2>${data.title}</h2>
+            <h2>${title}</h2>
 
-            <p class="price">$${data.price}</p>
+            <p class="price">$${price}</p>
 
-            <a href="product.html?id=${doc.id}" class="buy-btn">
-
+            <a href="product.html?id=${id}" class="buy-btn">
                 View Product
-
+                
             </a>
 
-            <button class="remove-btn" data-id="${doc.id}">
+            <button class="remove-btn" data-id="${id}">
                 ❌ Remove
             </button>
 
@@ -68,7 +67,10 @@ document.addEventListener("click", (e) => {
 
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-    wishlist = wishlist.filter(item => item !== id);
+    wishlist = wishlist.filter(item => {
+        const itemId = typeof item === "object" ? item.id : item;
+        return itemId !== id;
+    });
 
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
