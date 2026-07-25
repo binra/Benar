@@ -6,6 +6,7 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
+  setDoc,
   doc,
   getDoc
 
@@ -15,6 +16,29 @@ import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+
+// ======================
+// AliExpress Worker (used by the manual product picker below)
+// ======================
+const ALI_API_URL =
+    "https://quiet-haze-9edd.benarkalarey.workers.dev/";
+
+async function fetchAliExpressProductsAdmin(keyword = "phone") {
+
+    const response = await fetch(
+        `${ALI_API_URL}?keywords=${encodeURIComponent(keyword)}`
+    );
+
+    if (!response.ok) {
+
+        const errorText = await response.text();
+        throw new Error(errorText);
+
+    }
+
+    return await response.json();
+
+}
 
 const ADMIN_EMAIL = "benar4700@gmail.com";
 
@@ -94,11 +118,13 @@ const categoryName = document.getElementById("categoryName");
 
 const categoryIcon = document.getElementById("categoryIcon");
 
-const categoryShowFeatured = document.getElementById("categoryShowFeatured");
 
-const categoryShowBestDeal = document.getElementById("categoryShowBestDeal");
 
-const categoryShowNewArrival = document.getElementById("categoryShowNewArrival");
+
+
+
+
+
 
 const categoryList = document.getElementById("categoryList");
 
@@ -214,11 +240,7 @@ categoryForm.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const sectionFlags = {
-        showFeatured: categoryShowFeatured.checked,
-        showBestDeal: categoryShowBestDeal.checked,
-        showNewArrival: categoryShowNewArrival.checked
-    };
+
 
     if (editingCategoryId) {
 
@@ -226,8 +248,7 @@ categoryForm.addEventListener("submit", async (e) => {
             doc(db, "categories", editingCategoryId),
             {
                 name: categoryName.value.trim(),
-                icon: categoryIcon.value.trim(),
-                ...sectionFlags
+                icon: categoryIcon.value.trim()
             }
         );
 
@@ -248,9 +269,7 @@ categoryForm.addEventListener("submit", async (e) => {
 
             active: true,
 
-            order: Date.now(),
-
-            ...sectionFlags
+            order: Date.now()
 
         });
 
@@ -518,13 +537,7 @@ async function loadCategoryManager() {
             categoryName.value = data.name;
 
             categoryIcon.value = data.icon;
-
-            categoryShowFeatured.checked = data.showFeatured || false;
-
-            categoryShowBestDeal.checked = data.showBestDeal || false;
-
-            categoryShowNewArrival.checked = data.showNewArrival || false;
-
+            
             categoryForm.querySelector("button").textContent =
                 "Update Category";
 
@@ -737,12 +750,204 @@ async function loadAliClicks() {
 
 }
 
+// ======================
+// Manual AliExpress Product Picker
+// ======================
+
+const aliSearchInput = document.getElementById("aliSearchInput");
+const aliSearchBtn = document.getElementById("aliSearchBtn");
+const aliSearchResults = document.getElementById("aliSearchResults");
+const aliManualList = document.getElementById("aliManualList");
+
+async function searchAliExpress() {
+
+    if (!aliSearchInput || !aliSearchResults) return;
+
+    const keyword = aliSearchInput.value.trim() || "phone";
+
+    aliSearchResults.innerHTML = "<p>Searching...</p>";
+
+    try {
+
+        const data = await fetchAliExpressProductsAdmin(keyword);
+
+        const rawProducts =
+            data
+            ?.aliexpress_affiliate_product_query_response
+            ?.resp_result
+            ?.result
+            ?.products
+            ?.product || [];
+
+        if (rawProducts.length === 0) {
+
+            aliSearchResults.innerHTML = "<p>No products found.</p>";
+            return;
+
+        }
+
+        aliSearchResults.innerHTML = "";
+
+        rawProducts.forEach(item => {
+
+            const id = String(item.product_id);
+            const title = item.product_title || "No Title";
+            const image = item.product_main_image_url;
+            const price = Number(item.target_sale_price || 0);
+            const originalPrice = Number(item.target_original_price || 0);
+            const discount = item.discount || "";
+            const link = item.product_detail_url;
+            const rating = item.evaluate_rate || "0";
+            const reviews = item.lastest_volume || 0;
+            const category = item.first_level_category_name || "All";
+
+            const card = document.createElement("div");
+            card.className = "product";
+
+            card.innerHTML = `
+
+                <img src="${image}" style="width:100%;max-width:150px;">
+
+                <h3>${title}</h3>
+
+                <p>💰 $${price}</p>
+
+                <label>
+                    <input type="checkbox" class="ali-featured">
+                    Featured Products
+                </label>
+
+                <label>
+                    <input type="checkbox" class="ali-bestdeal">
+                    Best Deal
+                </label>
+
+                <label>
+                    <input type="checkbox" class="ali-newarrival">
+                    New Arrival
+                </label>
+
+                <button type="button" class="ali-save-btn">
+                    ✅ Save to Sections
+                </button>
+
+            `;
+
+            card.querySelector(".ali-save-btn").addEventListener("click", async () => {
+
+                const featured = card.querySelector(".ali-featured").checked;
+                const bestDeal = card.querySelector(".ali-bestdeal").checked;
+                const newArrival = card.querySelector(".ali-newarrival").checked;
+
+                if (!featured && !bestDeal && !newArrival) {
+                    alert("Please select at least one section first.");
+                    return;
+                }
+
+                await setDoc(doc(db, "aliManualProducts", id), {
+                    title,
+                    image,
+                    price,
+                    originalPrice,
+                    discount,
+                    link,
+                    rating,
+                    reviews,
+                    category,
+                    featured,
+                    bestDeal,
+                    newArrival,
+                    clicks: 0
+                });
+
+                alert("Product Saved ✅");
+
+                loadManualAliProducts();
+
+            });
+
+            aliSearchResults.appendChild(card);
+
+        });
+
+    } catch (err) {
+
+        console.error("AliExpress Search Error:", err);
+        aliSearchResults.innerHTML = "<p>❌ Search failed. Please try again.</p>";
+
+    }
+
+}
+
+async function loadManualAliProducts() {
+
+    if (!aliManualList) return;
+
+    aliManualList.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "aliManualProducts"));
+
+    snapshot.forEach(docItem => {
+
+        const data = docItem.data();
+
+        const sections = [
+            data.featured ? "Featured" : null,
+            data.bestDeal ? "Best Deal" : null,
+            data.newArrival ? "New Arrival" : null
+        ].filter(Boolean).join(", ") || "None";
+
+        aliManualList.innerHTML += `
+
+        <div class="product">
+
+            <img src="${data.image || ""}" style="width:100%;max-width:150px;">
+
+            <h3>${data.title || "Untitled"}</h3>
+
+            <p>💰 $${data.price || 0}</p>
+
+            <p>📌 Sections: ${sections}</p>
+
+            <p>👆 Clicks: ${data.clicks || 0}</p>
+
+            <button type="button" class="ali-remove-btn" data-id="${docItem.id}">
+                ❌ Remove
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+    document.querySelectorAll(".ali-remove-btn").forEach(btn => {
+
+        btn.onclick = async () => {
+
+            if (!confirm("Remove this product from all sections?")) return;
+
+            await deleteDoc(doc(db, "aliManualProducts", btn.dataset.id));
+
+            loadManualAliProducts();
+
+        };
+
+    });
+
+}
+
+if (aliSearchBtn) {
+    aliSearchBtn.addEventListener("click", searchAliExpress);
+}
+
 loadProducts();
 loadCategories();
 loadCategoryManager();
 loadBannerManager();
 loadTopProducts();
 loadAliClicks();
+loadManualAliProducts();
 adminSearch.addEventListener("input", loadProducts);
 
 adminFilter.addEventListener("change", loadProducts);

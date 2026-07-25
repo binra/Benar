@@ -73,6 +73,25 @@
     <h2>🛍️ Top AliExpress Clicks</h2>
     <div id="aliTopProducts"></div>
 
+    <hr>
+
+    <h2>🌟 Add AliExpress Product to Sections</h2>
+
+    <input
+        type="text"
+        id="aliSearchInput"
+        placeholder="Search AliExpress products (e.g. shoes, watch, toys)"
+    >
+
+    <button type="button" id="aliSearchBtn">
+        🔍 Search
+    </button>
+
+    <div id="aliSearchResults"></div>
+
+    <h3>📌 Currently Selected Products</h3>
+    <div id="aliManualList"></div>
+
     <form id="productForm">
 
         <input
@@ -192,21 +211,7 @@
         placeholder="Icon (📱)"
         required
     >
-
-    <label>
-        <input type="checkbox" id="categoryShowFeatured">
-        Show in Featured Products
-    </label>
-
-    <label>
-        <input type="checkbox" id="categoryShowBestDeal">
-        Show in Best Deals
-    </label>
-
-    <label>
-        <input type="checkbox" id="categoryShowNewArrival">
-        Show in New Arrivals
-    </label>
+    
 
     <button type="submit">
         Add Category

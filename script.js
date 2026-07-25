@@ -682,7 +682,45 @@ async function loadAllProducts() {
             );
         }
 
-        // 2) Build the list of AliExpress searches to run
+        allProducts = [...filteredMyProducts];
+
+        // 2) Get manually picked AliExpress products (chosen by you in admin panel)
+        //    These are the ONLY AliExpress products allowed into Featured / Best Deal / New Arrival
+        try {
+
+            const manualSnapshot = await getDocs(collection(db, "aliManualProducts"));
+
+            const manualProducts = [];
+
+            manualSnapshot.forEach(docItem => {
+
+                manualProducts.push({
+                    id: docItem.id,
+                    ...docItem.data()
+                });
+
+            });
+
+            let filteredManual = manualProducts;
+
+            if (keyword) {
+                filteredManual = manualProducts.filter(item =>
+                    item.title?.toLowerCase().includes(keyword.toLowerCase())
+                );
+            }
+
+            allProducts = [...allProducts, ...filteredManual];
+
+        } catch (err) {
+
+            console.error("Manual AliExpress Products Error:", err);
+
+        }
+
+        renderProducts();
+
+        // 3) Build the list of AliExpress category searches (for the main Products list only —
+        //    these NEVER appear in Featured / Best Deal / New Arrival)
         let aliCategoryList = [];
 
         if (keyword) {
@@ -709,10 +747,7 @@ async function loadAllProducts() {
                 .filter(cat => cat.name)
                 .map(cat => ({
                     name: cat.name,
-                    keyword: categoryKeywordMap[cat.name] || cat.name,
-                    showFeatured: cat.showFeatured || false,
-                    showBestDeal: cat.showBestDeal || false,
-                    showNewArrival: cat.showNewArrival || false
+                    keyword: categoryKeywordMap[cat.name] || cat.name
                 }));
 
             if (aliCategoryList.length === 0) {
@@ -721,47 +756,41 @@ async function loadAllProducts() {
 
         }
 
-        // 3) Get AliExpress products for each category (one at a time, to avoid rate limits / aborts)
-        let aliProducts = [];
-
+        // 4) Get AliExpress products for each category (one at a time, to avoid rate limits / aborts)
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        try {
+        for (const cat of aliCategoryList) {
 
-            const results = [];
+            let data = null;
 
-            for (const cat of aliCategoryList) {
+            try {
+
+                data = await fetchAliExpressProducts(cat.keyword);
+
+            } catch (err) {
+
+                console.error("AliExpress Error for", cat.name, "- retrying...", err);
+
+                await delay(800);
 
                 try {
 
-                    const data = await fetchAliExpressProducts(cat.keyword);
-                    results.push({
-                        data,
-                        categoryName: cat.name,
-                        showFeatured: cat.showFeatured,
-                        showBestDeal: cat.showBestDeal,
-                        showNewArrival: cat.showNewArrival
-                    });
+                    data = await fetchAliExpressProducts(cat.keyword);
 
-                } catch (err) {
+                } catch (err2) {
 
-                    console.error("AliExpress Error for", cat.name, err);
-                    results.push(null);
+                    console.error("AliExpress Error for", cat.name, "- skipped", err2);
 
                 }
 
-                await delay(100);
-
             }
 
-            results.forEach(result => {
-
-                if (!result) return;
+            if (data) {
 
                 const rawProducts =
-                    result.data
+                    data
                     ?.aliexpress_affiliate_product_query_response
                     ?.resp_result
                     ?.result
@@ -779,28 +808,32 @@ async function loadAllProducts() {
                     link: item.product_detail_url,
                     rating: item.evaluate_rate || "0",
                     reviews: item.lastest_volume || 0,
-                    category: result.categoryName,
-                    featured: result.showFeatured,
-                    bestDeal: result.showBestDeal,
-                    newArrival: result.showNewArrival,
+                    category: cat.name,
+                    featured: false,
+                    bestDeal: false,
+                    newArrival: false,
                     clicks: 0
 
                 }));
 
-                aliProducts.push(...mapped);
+                // Save these locally so product.html can find them later
+                let aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
 
-            });
+                mapped.forEach(item => {
+                    aliCache[String(item.id)] = item;
+                });
 
-        } catch (aliError) {
+                localStorage.setItem("aliProductsCache", JSON.stringify(aliCache));
 
-            console.error("AliExpress Error:", aliError);
+                allProducts = [...allProducts, ...mapped];
+
+                renderProducts();
+
+            }
+
+            await delay(500);
 
         }
-
-        // 4) Merge both lists — my products first, then AliExpress
-        allProducts = [...filteredMyProducts, ...aliProducts];
-
-        renderProducts();
 
     } catch (error) {
 
@@ -825,6 +858,7 @@ async function loadAllProducts() {
     }
 
 }
+
 
 // ======================
 // Render Products (no re-fetching — just displays allProducts)
