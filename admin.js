@@ -94,6 +94,12 @@ const categoryName = document.getElementById("categoryName");
 
 const categoryIcon = document.getElementById("categoryIcon");
 
+const categoryShowFeatured = document.getElementById("categoryShowFeatured");
+
+const categoryShowBestDeal = document.getElementById("categoryShowBestDeal");
+
+const categoryShowNewArrival = document.getElementById("categoryShowNewArrival");
+
 const categoryList = document.getElementById("categoryList");
 
 const bannerForm =
@@ -208,13 +214,20 @@ categoryForm.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+    const sectionFlags = {
+        showFeatured: categoryShowFeatured.checked,
+        showBestDeal: categoryShowBestDeal.checked,
+        showNewArrival: categoryShowNewArrival.checked
+    };
+
     if (editingCategoryId) {
 
         await updateDoc(
             doc(db, "categories", editingCategoryId),
             {
                 name: categoryName.value.trim(),
-                icon: categoryIcon.value.trim()
+                icon: categoryIcon.value.trim(),
+                ...sectionFlags
             }
         );
 
@@ -235,7 +248,9 @@ categoryForm.addEventListener("submit", async (e) => {
 
             active: true,
 
-            order: Date.now()
+            order: Date.now(),
+
+            ...sectionFlags
 
         });
 
@@ -504,6 +519,12 @@ async function loadCategoryManager() {
 
             categoryIcon.value = data.icon;
 
+            categoryShowFeatured.checked = data.showFeatured || false;
+
+            categoryShowBestDeal.checked = data.showBestDeal || false;
+
+            categoryShowNewArrival.checked = data.showNewArrival || false;
+
             categoryForm.querySelector("button").textContent =
                 "Update Category";
 
@@ -669,11 +690,59 @@ async function loadTopProducts() {
 
 }
 
+async function loadAliClicks() {
+
+    const aliTopContainer = document.getElementById("aliTopProducts");
+
+    if (!aliTopContainer) return;
+
+    aliTopContainer.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "aliClicks"));
+
+    const products = [];
+
+    snapshot.forEach(docItem => {
+
+        products.push({
+            id: docItem.id,
+            ...docItem.data()
+        });
+
+    });
+
+    products.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+
+    products.slice(0, 10).forEach((product, index) => {
+
+        aliTopContainer.innerHTML += `
+
+        <div class="product">
+
+            <img src="${product.image || ""}" style="width:100%;max-width:150px;">
+
+            <h3>${index + 1}. ${product.title || "Untitled"}</h3>
+
+            <p>👆 Clicks: ${product.clicks || 0}</p>
+
+            <p>💰 $${product.price || 0}</p>
+
+            <p>📂 ${product.category || ""}</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
 loadProducts();
 loadCategories();
 loadCategoryManager();
 loadBannerManager();
 loadTopProducts();
+loadAliClicks();
 adminSearch.addEventListener("input", loadProducts);
 
 adminFilter.addEventListener("change", loadProducts);

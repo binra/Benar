@@ -709,7 +709,10 @@ async function loadAllProducts() {
                 .filter(cat => cat.name)
                 .map(cat => ({
                     name: cat.name,
-                    keyword: categoryKeywordMap[cat.name] || cat.name
+                    keyword: categoryKeywordMap[cat.name] || cat.name,
+                    showFeatured: cat.showFeatured || false,
+                    showBestDeal: cat.showBestDeal || false,
+                    showNewArrival: cat.showNewArrival || false
                 }));
 
             if (aliCategoryList.length === 0) {
@@ -734,7 +737,13 @@ async function loadAllProducts() {
                 try {
 
                     const data = await fetchAliExpressProducts(cat.keyword);
-                    results.push({ data, categoryName: cat.name });
+                    results.push({
+                        data,
+                        categoryName: cat.name,
+                        showFeatured: cat.showFeatured,
+                        showBestDeal: cat.showBestDeal,
+                        showNewArrival: cat.showNewArrival
+                    });
 
                 } catch (err) {
 
@@ -771,9 +780,9 @@ async function loadAllProducts() {
                     rating: item.evaluate_rate || "0",
                     reviews: item.lastest_volume || 0,
                     category: result.categoryName,
-                    featured: true,
-                    bestDeal: true,
-                    newArrival: true,
+                    featured: result.showFeatured,
+                    bestDeal: result.showBestDeal,
+                    newArrival: result.showNewArrival,
                     clicks: 0
 
                 }));
@@ -785,10 +794,10 @@ async function loadAllProducts() {
         } catch (aliError) {
 
             console.error("AliExpress Error:", aliError);
-            
+
         }
 
-                // 4) Merge both lists — my products first, then AliExpress
+        // 4) Merge both lists — my products first, then AliExpress
         allProducts = [...filteredMyProducts, ...aliProducts];
 
         renderProducts();
