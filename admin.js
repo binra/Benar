@@ -356,6 +356,8 @@ async function loadProducts() {
     let dealsCount = 0;
     let sellerCount = 0;
     let totalClicks = 0;
+            let totalViews = 0;
+
 
     snapshot.forEach((productDoc) => {
 
@@ -383,6 +385,8 @@ async function loadProducts() {
         if(data.bestSeller) sellerCount++;
 
         totalClicks += data.clicks || 0;
+                totalViews += data.views || 0;
+
 
         adminProducts.innerHTML += `
         <div class="product">
@@ -399,6 +403,8 @@ async function loadProducts() {
             <p>💰 $${data.price}</p>
 
             <p>👆 Clicks: ${data.clicks || 0}</p>
+            
+            <p>👁️ Views: ${data.views || 0}</p>
 
             <p>⭐ Rating: ${data.rating}</p>
 
@@ -428,6 +434,8 @@ async function loadProducts() {
     document.getElementById("bestSellers").textContent = sellerCount;
 
     document.getElementById("totalClicks").textContent = totalClicks;
+
+    document.getElementById("totalViews").textContent = totalViews;
 
     // Delete
     document.querySelectorAll(".delete-btn").forEach(btn => {

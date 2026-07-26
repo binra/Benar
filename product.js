@@ -4,8 +4,12 @@ import {
     doc,
     getDoc,
     collection,
-    getDocs
+    getDocs,
+    updateDoc,
+    setDoc,
+    increment
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
 
 const params = new URLSearchParams(window.location.search);
 
@@ -45,12 +49,44 @@ async function loadProduct() {
     }
 
     if (!data) {
-        container.innerHTML = "<h2>Product not found.</h2>";
-        return;
-    }
-    
+            container.innerHTML = "<h2>Product not found.</h2>";
+            return;
+        }
 
-    let viewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+        // Track a view for this product
+        try {
+
+            if (isFromFirestore) {
+
+                await updateDoc(
+                    doc(db, "products", id),
+                    { views: increment(1) }
+                );
+
+            } else {
+
+                await setDoc(
+                    doc(db, "aliClicks", String(id)),
+                    {
+                        title: data.title,
+                        image: data.image,
+                        price: data.price,
+                        category: data.category,
+                        views: increment(1)
+                    },
+                    { merge: true }
+                );
+
+            }
+
+        } catch (err) {
+
+            console.error("View tracking error:", err);
+
+        }
+
+        let viewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+
 
     // Remove if already exists
     viewed = viewed.filter(item => item.id !== id);
