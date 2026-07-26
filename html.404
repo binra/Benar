@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | Novexa</title>
+
+    <meta name="robots" content="noindex, follow">
+
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="theme.js"></script>
+
+    <style>
+        .error-page {
+            min-height:60vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:40px 20px;
+        }
+
+        .error-page h1 {
+            font-size:90px;
+            margin-bottom:10px;
+            color:#ff9900;
+        }
+
+        .error-page h2 {
+            font-size:24px;
+            margin-bottom:15px;
+        }
+
+        .error-page p {
+            color:#666;
+            margin-bottom:30px;
+            max-width:400px;
+        }
+
+        .dark-mode .error-page p {
+            color:#aaa;
+        }
+
+        .error-page a.home-btn {
+            background:#ff9900;
+            color:#fff;
+            padding:14px 30px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        .error-page a.home-btn:hover {
+            background:#e68a00;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        <a href="index.html">
+            <img src="images/logo.png" alt="Logo">
+        </a>
+        <h1>Novexa</h1>
+    </div>
+
+    <button id="themeToggle" class="theme-toggle-btn" type="button">🌙</button>
+
+</header>
+
+<main class="error-page">
+
+    <h1>404</h1>
+
+    <h2>😕 Oops! This page doesn't exist.</h2>
+
+    <p>
+        The page you're looking for may have been moved, deleted,
+        or the link you followed is broken.
+    </p>
+
+    <a href="index.html" class="home-btn">
+        ← Back to Home
+    </a>
+
+</main>
+
+<footer>
+    <p>© 2026 Novexa</p>
+</footer>
+
+</body>
+</html>
