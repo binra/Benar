@@ -551,12 +551,13 @@ function productCard(id, data) {
         <a href="product.html?id=${id}">
 
             <img
-                src="${data.image}"
+                src="${data.image || 'https://via.placeholder.com/300x300?text=No+Image'}"
+                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';"
                 alt="${data.title}"
-                loading="lazy"
-                decoding="async">
+                loading="lazy" decoding="async">
 
         </a>
+
 
         <h2>
 
