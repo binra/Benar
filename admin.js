@@ -723,14 +723,28 @@ async function loadAliClicks() {
 
     const products = [];
 
+    let aliTotalViews = 0;
+
     snapshot.forEach(docItem => {
+
+        const data = docItem.data();
+
+        aliTotalViews += data.views || 0;
 
         products.push({
             id: docItem.id,
-            ...docItem.data()
+            ...data
         });
 
     });
+
+    // Add AliExpress views on top of the own-products views already shown
+    const currentViews = Number(
+        document.getElementById("totalViews").textContent
+    ) || 0;
+
+    document.getElementById("totalViews").textContent =
+        currentViews + aliTotalViews;
 
     products.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
 
@@ -745,6 +759,8 @@ async function loadAliClicks() {
             <h3>${index + 1}. ${product.title || "Untitled"}</h3>
 
             <p>👆 Clicks: ${product.clicks || 0}</p>
+
+            <p>👁️ Views: ${product.views || 0}</p>
 
             <p>💰 $${product.price || 0}</p>
 
@@ -949,13 +965,20 @@ if (aliSearchBtn) {
     aliSearchBtn.addEventListener("click", searchAliExpress);
 }
 
-loadProducts();
-loadCategories();
-loadCategoryManager();
-loadBannerManager();
-loadTopProducts();
-loadAliClicks();
-loadManualAliProducts();
+async function initAdminPanel() {
+
+    await loadProducts();
+    loadCategories();
+    loadCategoryManager();
+    loadBannerManager();
+    loadTopProducts();
+    await loadAliClicks();
+    loadManualAliProducts();
+
+}
+
+initAdminPanel();
+
 adminSearch.addEventListener("input", loadProducts);
 
 adminFilter.addEventListener("change", loadProducts);
