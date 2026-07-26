@@ -9,6 +9,7 @@ import {
     getDocs,
     doc,
     updateDoc,
+    setDoc,
     increment,
     query,
     orderBy
@@ -522,13 +523,19 @@ function productCard(id, data) {
 
     <div class="product"
          data-id="${id}"
-         data-category="${data.category || "All"}">
+         data-category="${data.category || "All"}"
+         data-source="${data.source === "ali" ? "ali" : "own"}">
+
+        ${data.source === "ali" ? `
 
         <div class="badge">
 
             🛍️ AliExpress
 
         </div>
+
+        ` : ""}
+
 
         ${data.discount ? `
 
@@ -709,10 +716,12 @@ async function loadAllProducts() {
 
                 manualProducts.push({
                     id: docItem.id,
+                    source: "ali",
                     ...docItem.data()
                 });
 
             });
+
 
             let filteredManual = manualProducts;
 
@@ -824,6 +833,7 @@ async function loadAllProducts() {
                 const mapped = rawProducts.map(item => ({
 
                     id: item.product_id,
+                    source: "ali",
                     title: item.product_title || item.title || "No Title",
                     image: item.product_main_image_url,
                     price: Number(item.target_sale_price || 0),
@@ -1110,3 +1120,59 @@ loadMoreCategoriesMenu();
 loadBanners();
 
 loadAllProducts();
+
+// ======================
+// Click Tracking (own products only — increments "clicks" field in Firestore)
+// ======================
+document.addEventListener("click", async (e) => {
+
+    const link = e.target.closest(".buy-btn");
+
+    if (!link) return;
+
+    const card = link.closest(".product");
+
+    if (!card) return;
+
+    const id = card.dataset.id;
+
+    if (!id) return;
+
+    const source = card.dataset.source;
+
+    try {
+
+        if (source === "ali") {
+
+            const product = allProducts.find(p => String(p.id) === String(id));
+
+            if (!product) return;
+
+            await setDoc(
+                doc(db, "aliClicks", String(id)),
+                {
+                    title: product.title,
+                    image: product.image,
+                    price: product.price,
+                    category: product.category,
+                    clicks: increment(1)
+                },
+                { merge: true }
+            );
+
+        } else {
+
+            await updateDoc(
+                doc(db, "products", id),
+                { clicks: increment(1) }
+            );
+
+        }
+
+    } catch (err) {
+
+        console.error("Click tracking error:", err);
+
+    }
+
+});
