@@ -4,10 +4,7 @@ import {
     doc,
     getDoc,
     collection,
-    getDocs,
-    updateDoc,
-    setDoc,
-    increment
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 
@@ -49,43 +46,47 @@ async function loadProduct() {
     }
 
     if (!data) {
-            container.innerHTML = "<h2>Product not found.</h2>";
-            return;
-        }
+        container.innerHTML = "<h2>Product not found.</h2>";
+        return;
+    }
 
-        // Track a view for this product
-        try {
+    // ======================
+    // SEO: set page title + meta tags dynamically per product
+    // ======================
+    document.title = `${data.title} | Novexa`;
 
-            if (isFromFirestore) {
+    function setMetaTag(selector, attr, value) {
 
-                await updateDoc(
-                    doc(db, "products", id),
-                    { views: increment(1) }
-                );
+        let tag = document.querySelector(selector);
 
+        if (!tag) {
+
+            tag = document.createElement("meta");
+
+            if (selector.includes("property=")) {
+                tag.setAttribute("property", attr);
             } else {
-
-                await setDoc(
-                    doc(db, "aliClicks", String(id)),
-                    {
-                        title: data.title,
-                        image: data.image,
-                        price: data.price,
-                        category: data.category,
-                        views: increment(1)
-                    },
-                    { merge: true }
-                );
-
+                tag.setAttribute("name", attr);
             }
 
-        } catch (err) {
-
-            console.error("View tracking error:", err);
+            document.head.appendChild(tag);
 
         }
 
-        let viewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
+        tag.setAttribute("content", value);
+
+    }
+
+    const shortDescription =
+        (data.description || data.title || "").slice(0, 155);
+
+    setMetaTag('meta[name="description"]', "description", shortDescription);
+    setMetaTag('meta[property="og:title"]', "og:title", `${data.title} | Novexa`);
+    setMetaTag('meta[property="og:description"]', "og:description", shortDescription);
+    setMetaTag('meta[property="og:image"]', "og:image", data.image || "");
+    setMetaTag('meta[property="og:type"]', "og:type", "product");
+
+    let viewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
 
 
     // Remove if already exists
@@ -147,16 +148,9 @@ async function loadProduct() {
         </div>
 
         ` : ""}
-        
-                <img
-                    src="${data.image}"
-                    referrerpolicy="no-referrer"
-                    onerror="this.style.opacity='0.3';"
-                    alt="${data.title}"
-                    loading="lazy" decoding="async">
+            <img src="${data.image}" alt="${data.title}" class="main-image">
 
-
-                <div class="details">
+            <div class="details">
 
 
                 <h1>${data.title}</h1>
@@ -204,11 +198,7 @@ async function loadProduct() {
 
                         <a href="product.html?id=${product.id}">
 
-                            <img
-                                src="${product.image}"
-                                referrerpolicy="no-referrer"
-                                alt="${product.title}">
-
+                            <img src="${product.image}" alt="${product.title}">
 
                             <h3>${product.title}</h3>
 
@@ -232,6 +222,35 @@ async function loadProduct() {
 
         ` : ""}
     `;
+
+    // ======================
+    // SEO: Product structured data (JSON-LD)
+    // ======================
+    const existingLd = document.getElementById("productLdJson");
+
+    if (existingLd) existingLd.remove();
+
+    const ldScript = document.createElement("script");
+
+    ldScript.type = "application/ld+json";
+    ldScript.id = "productLdJson";
+
+    ldScript.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": data.title,
+        "image": data.image ? [data.image] : [],
+        "description": (data.description || data.title || "").slice(0, 300),
+        "offers": {
+            "@type": "Offer",
+            "price": data.price || 0,
+            "priceCurrency": "USD",
+            "url": window.location.href,
+            "availability": "https://schema.org/InStock"
+        }
+    });
+
+    document.head.appendChild(ldScript);
 
 }
 
