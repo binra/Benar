@@ -850,20 +850,22 @@ color:#2196f3;
 .dark-mode .cart-box,
 .dark-mode .wishlist,
 .dark-mode .best-deals,
+.dark-mode .featured,
 .dark-mode .admin-page,
 .dark-mode .product-details,
 .dark-mode .related-section {
-    background:#1e1e1e;
+    background:#121212;
     color:#eaeaea;
 }
 
 .dark-mode .product h2,
 .dark-mode .product h3,
 .dark-mode .card h3,
-.dark-mode .featured,
+
 .dark-mode .section-title {
     color:#eaeaea;
 }
+
 
 .dark-mode input,
 .dark-mode select,
