@@ -276,13 +276,14 @@ async function loadCategoriesMenu() {
         categories.slice(0, 6).forEach(category => {
 
             dynamicCategories.innerHTML += `
-                <a href="#"
-                   data-filter="${category.name}">
+                <a href="index.html?category=${encodeURIComponent(category.name)}">
                    ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
         });
+
+        
 
     } catch (err) {
 
@@ -320,16 +321,16 @@ async function loadMoreCategoriesMenu() {
 
         }
 
-        categories.slice(6).forEach(category => {
+                categories.slice(6).forEach(category => {
 
             dynamicMoreCategories.innerHTML += `
-                <a href="#"
-                   data-filter="${category.name}">
+                <a href="index.html?category=${encodeURIComponent(category.name)}">
                    ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
         });
+
 
     } catch (err) {
 
@@ -655,6 +656,10 @@ async function loadAllProducts() {
 
     const keyword = searchInput?.value?.trim() || "";
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryFilter = urlParams.get("category");
+
+
     try {
 
         // 1) Get my own products from Firestore
@@ -673,14 +678,19 @@ async function loadAllProducts() {
 
         });
 
-        // Filter my products by search keyword
-        let filteredMyProducts = myProducts;
+        // Filter my products by search keyword or category
+                let filteredMyProducts = myProducts;
 
-        if (keyword) {
-            filteredMyProducts = myProducts.filter(item =>
-                item.title?.toLowerCase().includes(keyword.toLowerCase())
-            );
-        }
+                if (categoryFilter) {
+                    filteredMyProducts = myProducts.filter(item =>
+                        item.category === categoryFilter
+                    );
+                } else if (keyword) {
+                    filteredMyProducts = myProducts.filter(item =>
+                        item.title?.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                }
+
 
         allProducts = [...filteredMyProducts];
 
@@ -720,16 +730,27 @@ async function loadAllProducts() {
         renderProducts();
 
         // 3) Build the list of AliExpress category searches (for the main Products list only —
-        //    these NEVER appear in Featured / Best Deal / New Arrival)
-        let aliCategoryList = [];
+                //    these NEVER appear in Featured / Best Deal / New Arrival)
+                let aliCategoryList = [];
 
-        if (keyword) {
+                if (categoryFilter) {
 
-            aliCategoryList = [
-                { name: "All", keyword: keyword }
-            ];
+                    // A specific category was clicked — load ONLY that category, fast
+                    aliCategoryList = [
+                        {
+                            name: categoryFilter,
+                            keyword: categoryKeywordMap[categoryFilter] || categoryFilter
+                        }
+                    ];
 
-        } else {
+                } else if (keyword) {
+
+                    aliCategoryList = [
+                        { name: "All", keyword: keyword }
+                    ];
+
+                } else {
+
 
             if (categories.length === 0) {
 
