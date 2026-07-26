@@ -167,9 +167,7 @@ header{
     flex-wrap:wrap;
 }
 
-.products{
-    grid-template-columns:1fr;
-}
+
 
 }
 #dashboard{
