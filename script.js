@@ -818,18 +818,17 @@ async function loadAllProducts() {
 
         }
 
-        // 4) Get AliExpress products for each category (one at a time, to avoid rate limits / aborts)
+        // 4) Get AliExpress products in concurrent batches (much faster than one-by-one,
+        //    while still avoiding sending all ~20 requests at once)
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        for (const cat of aliCategoryList) {
-
-            let data = null;
+        async function fetchWithRetry(cat) {
 
             try {
 
-                data = await fetchAliExpressProducts(cat.keyword);
+                return await fetchAliExpressProducts(cat.keyword);
 
             } catch (err) {
 
@@ -839,17 +838,36 @@ async function loadAllProducts() {
 
                 try {
 
-                    data = await fetchAliExpressProducts(cat.keyword);
+                    return await fetchAliExpressProducts(cat.keyword);
 
                 } catch (err2) {
 
                     console.error("AliExpress Error for", cat.name, "- skipped", err2);
+                    return null;
 
                 }
 
             }
 
-            if (data) {
+        }
+
+        const BATCH_SIZE = 5;
+
+        for (let i = 0; i < aliCategoryList.length; i += BATCH_SIZE) {
+
+            const batch = aliCategoryList.slice(i, i + BATCH_SIZE);
+
+            const results = await Promise.all(
+                batch.map(cat =>
+                    fetchWithRetry(cat).then(data => ({ data, cat }))
+                )
+            );
+
+            let aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
+
+            results.forEach(({ data, cat }) => {
+
+                if (!data) return;
 
                 const rawProducts =
                     data
@@ -879,22 +897,23 @@ async function loadAllProducts() {
 
                 }));
 
-                // Save these locally so product.html can find them later
-                let aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
 
+                
                 mapped.forEach(item => {
                     aliCache[String(item.id)] = item;
                 });
 
-                localStorage.setItem("aliProductsCache", JSON.stringify(aliCache));
+
 
                 allProducts = [...allProducts, ...mapped];
 
-                renderProducts();
+            });
 
-            }
+            localStorage.setItem("aliProductsCache", JSON.stringify(aliCache));
 
-            await delay(500);
+            renderProducts();
+
+            await delay(300);
 
         }
 
