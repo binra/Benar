@@ -817,3 +817,92 @@ color:#2196f3;
     margin-left:8px;
     font-size:15px;
 }
+
+
+/* ===================== DARK MODE ===================== */
+
+.dark-mode body,
+.dark-mode {
+    background:#121212;
+    color:#eaeaea;
+}
+
+.dark-mode header,
+.dark-mode .menu,
+.dark-mode footer,
+.dark-mode .dropdown-content,
+.dark-mode .dropbtn {
+    background:#0a0a0a;
+    color:#eaeaea;
+}
+
+.dark-mode .hero {
+    background:#1a1a1a;
+}
+
+.dark-mode .hero-content h2,
+.dark-mode .hero-content p {
+    color:#f1f1f1;
+}
+
+.dark-mode .product,
+.dark-mode .card,
+.dark-mode .cart-box,
+.dark-mode .wishlist,
+.dark-mode .best-deals,
+.dark-mode .admin-page,
+.dark-mode .product-details,
+.dark-mode .related-section {
+    background:#1e1e1e;
+    color:#eaeaea;
+}
+
+.dark-mode .product h2,
+.dark-mode .product h3,
+.dark-mode .card h3,
+.dark-mode .featured,
+.dark-mode .section-title {
+    color:#eaeaea;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background:#2a2a2a;
+    color:#eaeaea;
+    border:1px solid #444;
+}
+
+.dark-mode .search input {
+    background:#2a2a2a;
+    color:#eaeaea;
+}
+
+.dark-mode a {
+    color:#eaeaea;
+}
+
+.dark-mode .rating {
+    color:#ffb400;
+}
+
+.dark-mode .price,
+.dark-mode .new-price {
+    color:#4caf50;
+}
+
+.dark-mode .old-price {
+    color:#999;
+}
+
+/* ===================== THEME TOGGLE BUTTON ===================== */
+
+.theme-toggle-btn {
+    background:none;
+    border:2px solid currentColor;
+    color:inherit;
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:16px;
+    cursor:pointer;
+}
