@@ -36,9 +36,11 @@ function loadWishlist() {
         <div class="product">
 
             <img
-                src="${data.image || 'https://via.placeholder.com/300x300?text=No+Image'}"
-                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';"
-                alt="${data.title}">
+                src="${data.image}"
+                referrerpolicy="no-referrer"
+                onerror="this.style.opacity='0.3';"
+                alt="${data.title}"
+                loading="lazy" decoding="async">
 
 
             <h2>${title}</h2>

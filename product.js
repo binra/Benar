@@ -113,10 +113,12 @@ async function loadProduct() {
         ` : ""}
         
                 <img
-                    src="${data.image || 'https://via.placeholder.com/500x500?text=No+Image'}"
-                    onerror="this.onerror=null; this.src='https://via.placeholder.com/500x500?text=No+Image';"
+                    src="${data.image}"
+                    referrerpolicy="no-referrer"
+                    onerror="this.style.opacity='0.3';"
                     alt="${data.title}"
-                    class="main-image">
+                    loading="lazy" decoding="async">
+
 
                 <div class="details">
 
@@ -167,8 +169,8 @@ async function loadProduct() {
                         <a href="product.html?id=${product.id}">
 
                             <img
-                                src="${product.image || 'https://via.placeholder.com/300x300?text=No+Image'}"
-                                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';"
+                                src="${product.image}"
+                                referrerpolicy="no-referrer"
                                 alt="${product.title}">
 
 
