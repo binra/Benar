@@ -35,7 +35,11 @@ function loadWishlist() {
         container.innerHTML += `
         <div class="product">
 
-            <img src="${image}" alt="${title}">
+            <img
+                src="${data.image || 'https://via.placeholder.com/300x300?text=No+Image'}"
+                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';"
+                alt="${data.title}">
+
 
             <h2>${title}</h2>
 

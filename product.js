@@ -111,9 +111,14 @@ async function loadProduct() {
         </div>
 
         ` : ""}
-            <img src="${data.image}" alt="${data.title}" class="main-image">
+        
+                <img
+                    src="${data.image || 'https://via.placeholder.com/500x500?text=No+Image'}"
+                    onerror="this.onerror=null; this.src='https://via.placeholder.com/500x500?text=No+Image';"
+                    alt="${data.title}"
+                    class="main-image">
 
-            <div class="details">
+                <div class="details">
 
 
                 <h1>${data.title}</h1>
@@ -161,7 +166,11 @@ async function loadProduct() {
 
                         <a href="product.html?id=${product.id}">
 
-                            <img src="${product.image}" alt="${product.title}">
+                            <img
+                                src="${product.image || 'https://via.placeholder.com/300x300?text=No+Image'}"
+                                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';"
+                                alt="${product.title}">
+
 
                             <h3>${product.title}</h3>
 
