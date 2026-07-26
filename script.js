@@ -93,6 +93,35 @@ async function fetchAliExpressProducts(keyword = "phone") {
 // Helpers
 // ======================
 
+function skeletonCard() {
+
+    return `
+    <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line price"></div>
+    </div>
+    `;
+
+}
+
+function showInitialSkeletons() {
+
+    const skeletons = skeletonCard().repeat(8);
+
+    if (productsContainer) productsContainer.innerHTML = skeletons;
+
+    if (featuredContainer) featuredContainer.innerHTML = skeletonCard().repeat(4);
+
+    if (bestDealsContainer) bestDealsContainer.innerHTML = skeletonCard().repeat(4);
+
+    if (newArrivalsContainer) newArrivalsContainer.innerHTML = skeletonCard().repeat(4);
+
+    if (popularContainer) popularContainer.innerHTML = skeletons;
+
+}
+
 function clearSections() {
 
     if (productsContainer) productsContainer.innerHTML = "";
@@ -662,7 +691,7 @@ const categoryKeywordMap = {
 
 async function loadAllProducts() {
 
-    clearSections();
+    showInitialSkeletons();
 
     const keyword = searchInput?.value?.trim() || "";
 
