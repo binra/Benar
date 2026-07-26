@@ -32,14 +32,15 @@ function loadWishlist() {
         const image = typeof item === "object" ? item.image : "";
         const price = typeof item === "object" ? item.price : 0;
 
+        
         container.innerHTML += `
         <div class="product">
 
             <img
-                src="${data.image}"
+                src="${image}"
                 referrerpolicy="no-referrer"
                 onerror="this.style.opacity='0.3';"
-                alt="${data.title}"
+                alt="${title}"
                 loading="lazy" decoding="async">
 
 
