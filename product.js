@@ -21,15 +21,34 @@ async function loadProduct() {
         return;
     }
 
+    let data = null;
+    let isFromFirestore = false;
+
+    // 1) Try Firestore first (my own products)
     const productRef = doc(db, "products", id);
     const productSnap = await getDoc(productRef);
 
-    if (!productSnap.exists()) {
+    if (productSnap.exists()) {
+
+        data = { ...productSnap.data() };
+        isFromFirestore = true;
+
+    } else {
+
+        // 2) Not in Firestore — check the AliExpress cache saved in localStorage
+        const aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
+
+        if (aliCache[id]) {
+            data = aliCache[id];
+        }
+
+    }
+
+    if (!data) {
         container.innerHTML = "<h2>Product not found.</h2>";
         return;
     }
-
-    const data = { ...productSnap.data() };
+    
 
     let viewed = JSON.parse(localStorage.getItem("recentlyViewed")) || [];
 
@@ -49,27 +68,34 @@ async function loadProduct() {
         "recentlyViewed",
         JSON.stringify(viewed)
     );
-    const snapshot = await getDocs(collection(db, "products"));
 
+
+    // Related products — only from Firestore (my own products in the same category)
     let relatedProducts = [];
 
-    snapshot.forEach((item) => {
+    if (isFromFirestore) {
 
-        if (
-            item.id !== id &&
-            item.data().category === data.category
-        ) {
+        const snapshot = await getDocs(collection(db, "products"));
 
-            relatedProducts.push({
-                id: item.id,
-                ...item.data()
-            });
+        snapshot.forEach((item) => {
 
-        }
+            if (
+                item.id !== id &&
+                item.data().category === data.category
+            ) {
 
-    });
+                relatedProducts.push({
+                    id: item.id,
+                    ...item.data()
+                });
 
-    relatedProducts = relatedProducts.slice(0, relatedLimit);
+            }
+
+        });
+
+        relatedProducts = relatedProducts.slice(0, relatedLimit);
+
+    }
 
     container.innerHTML = `
         <div class="product-details">
@@ -104,11 +130,11 @@ async function loadProduct() {
                 <h2>$${data.price}</h2>
 
                 <p style="color:red;font-size:20px;">
-                    ${data.description}
+                    ${data.description || ""}
                 </p>
 
                 <a href="${data.link}" target="_blank" class="buy-btn">
-                    Buy on Amazon
+                    ${isFromFirestore ? "Buy on Amazon" : "Get Best Price"}
                 </a>
 
                 <br><br>
@@ -120,6 +146,8 @@ async function loadProduct() {
             </div>
 
         </div>
+
+        ${relatedProducts.length > 0 ? `
 
         <div class="related-section">
 
@@ -154,6 +182,8 @@ async function loadProduct() {
             </div>
 
         </div>
+
+        ` : ""}
     `;
 
 }
