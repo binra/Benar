@@ -172,12 +172,12 @@ function initWishlist() {
         if (isSaved) {
 
             btn.classList.add("active");
-            btn.textContent = "Ã¢ÂÂ¥";
+            btn.textContent = "♡";
 
         } else {
 
             btn.classList.remove("active");
-            btn.textContent = "Ã¢ÂÂ¡";
+            btn.textContent = "❤️";
 
         }
 
@@ -204,7 +204,7 @@ function initWishlist() {
                 );
 
                 btn.classList.remove("active");
-                btn.textContent = "Ã¢ÂÂ¡";
+                btn.textContent = "❌";
 
             } else {
 
@@ -220,7 +220,7 @@ function initWishlist() {
                     });
 
                     btn.classList.add("active");
-                    btn.textContent = "Ã¢ÂÂ¥";
+                    btn.textContent = "➕";
 
                 }
 
@@ -307,7 +307,7 @@ async function loadCategoriesMenu() {
 
             dynamicCategories.innerHTML += `
                 <a href="index.html?category=${encodeURIComponent(category.name)}">
-                   ${category.icon || "Ã°ÂÂÂ¦"} ${category.name}
+                   ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
@@ -355,7 +355,7 @@ async function loadMoreCategoriesMenu() {
 
             dynamicMoreCategories.innerHTML += `
                 <a href="index.html?category=${encodeURIComponent(category.name)}">
-                   ${category.icon || "Ã°ÂÂÂ¦"} ${category.name}
+                   ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
@@ -559,7 +559,7 @@ function productCard(id, data) {
 
         <div class="badge">
 
-            Ã°ÂÂÂÃ¯Â¸Â AliExpress
+            🛍️ AliExpress
 
         </div>
 
@@ -580,7 +580,7 @@ function productCard(id, data) {
 
              data-id="${id}">
 
-            Ã¢ÂÂ¡
+            ❤️
 
         </div>
 
@@ -605,7 +605,7 @@ function productCard(id, data) {
 
         <div class="rating">
 
-            Ã¢Â­Â ${data.rating || "0"}
+            ⭐ ${data.rating || "0"}
 
             <span>
 
@@ -637,7 +637,7 @@ function productCard(id, data) {
 
         <p class="shipping">
 
-            Ã°ÂÂÂ Free Shipping
+            🚚 Free Shipping
 
         </p>
 
@@ -647,8 +647,7 @@ function productCard(id, data) {
             rel="noopener"
             class="buy-btn">
 
-            Ã°ÂÂÂ¥ Get Best Price
-
+           🔥 Get Best Price
         </a>
 
     </div>
@@ -772,13 +771,13 @@ async function loadAllProducts() {
 
         renderProducts();
 
-        // 3) Build the list of AliExpress category searches (for the main Products list only Ã¢ÂÂ
+        // 3) Build the list of AliExpress category searches (for the main Products list only -
                 //    these NEVER appear in Featured / Best Deal / New Arrival)
                 let aliCategoryList = [];
 
                 if (categoryFilter) {
 
-                    // A specific category was clicked Ã¢ÂÂ load ONLY that category, fast
+                    // A specific category was clicked - load ONLY that category, fast
                     aliCategoryList = [
                         {
                             name: categoryFilter,
@@ -911,7 +910,7 @@ async function loadAllProducts() {
 
                 <div style="padding:40px;text-align:center">
 
-                    <h2>Ã¢ÂÂ Failed to load products</h2>
+                    <h2>❌ Failed to load products</h2>
 
                     <p>${error.message}</p>
 
@@ -927,7 +926,7 @@ async function loadAllProducts() {
 
 
 // ======================
-// Render Products (no re-fetching Ã¢ÂÂ just displays allProducts)
+// Render Products (no re-fetching - just displays allProducts)
 // ======================
 function renderProducts() {
 
@@ -1154,7 +1153,7 @@ loadBanners();
 loadAllProducts();
 
 // ======================
-// Click Tracking (own products only Ã¢ÂÂ increments "clicks" field in Firestore)
+// Click Tracking (own products only - increments "clicks" field in Firestore)
 // ======================
 document.addEventListener("click", async (e) => {
 
