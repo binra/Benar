@@ -172,12 +172,12 @@ function initWishlist() {
         if (isSaved) {
 
             btn.classList.add("active");
-            btn.textContent = "♡";
+            btn.textContent = "❤️";
 
         } else {
 
             btn.classList.remove("active");
-            btn.textContent = "❤️";
+            btn.textContent = "♡";
 
         }
 
@@ -204,7 +204,7 @@ function initWishlist() {
                 );
 
                 btn.classList.remove("active");
-                btn.textContent = "❌";
+                btn.textContent = "♡";
 
             } else {
 
@@ -220,7 +220,7 @@ function initWishlist() {
                     });
 
                     btn.classList.add("active");
-                    btn.textContent = "➕";
+                    btn.textContent = "❤️";
 
                 }
 
