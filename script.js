@@ -172,12 +172,12 @@ function initWishlist() {
         if (isSaved) {
 
             btn.classList.add("active");
-            btn.textContent = "â¥";
+            btn.textContent = "♥";
 
         } else {
 
             btn.classList.remove("active");
-            btn.textContent = "â¡";
+            btn.textContent = "♡";
 
         }
 
@@ -204,7 +204,7 @@ function initWishlist() {
                 );
 
                 btn.classList.remove("active");
-                btn.textContent = "â¡";
+                btn.textContent = "♡";
 
             } else {
 
@@ -220,7 +220,7 @@ function initWishlist() {
                     });
 
                     btn.classList.add("active");
-                    btn.textContent = "â¥";
+                    btn.textContent = "♥";
 
                 }
 
@@ -307,7 +307,7 @@ async function loadCategoriesMenu() {
 
             dynamicCategories.innerHTML += `
                 <a href="index.html?category=${encodeURIComponent(category.name)}">
-                   ${category.icon || "ð¦"} ${category.name}
+                   ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
@@ -355,7 +355,7 @@ async function loadMoreCategoriesMenu() {
 
             dynamicMoreCategories.innerHTML += `
                 <a href="index.html?category=${encodeURIComponent(category.name)}">
-                   ${category.icon || "ð¦"} ${category.name}
+                   ${category.icon || "📦"} ${category.name}
                 </a>
             `;
 
@@ -559,7 +559,7 @@ function productCard(id, data) {
 
         <div class="badge">
 
-            ðï¸ AliExpress
+            🛍️ AliExpress
 
         </div>
 
@@ -580,7 +580,7 @@ function productCard(id, data) {
 
              data-id="${id}">
 
-            â¡
+            ♡
 
         </div>
 
@@ -605,7 +605,7 @@ function productCard(id, data) {
 
         <div class="rating">
 
-            â­ ${data.rating || "0"}
+            ⭐ ${data.rating || "0"}
 
             <span>
 
@@ -637,7 +637,7 @@ function productCard(id, data) {
 
         <p class="shipping">
 
-            ð Free Shipping
+            🚚 Free Shipping
 
         </p>
 
@@ -647,7 +647,7 @@ function productCard(id, data) {
             rel="noopener"
             class="buy-btn">
 
-            ð¥ Get Best Price
+            🔥 Get Best Price
 
         </a>
 
@@ -688,6 +688,142 @@ const categoryKeywordMap = {
     "Cameras": "camera",
     "Smart Watches": "smart watch"
 };
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(cat) {
+
+    try {
+
+        return await fetchAliExpressProducts(cat.keyword);
+
+    } catch (err) {
+
+        console.error("AliExpress Error for", cat.name, "- retrying...", err);
+
+        await delay(800);
+
+        try {
+
+            return await fetchAliExpressProducts(cat.keyword);
+
+        } catch (err2) {
+
+            console.error("AliExpress Error for", cat.name, "- skipped", err2);
+            return null;
+
+        }
+
+    }
+
+}
+
+async function loadCategoryBatch(catList) {
+
+    const BATCH_SIZE = 5;
+
+    for (let i = 0; i < catList.length; i += BATCH_SIZE) {
+
+        const batch = catList.slice(i, i + BATCH_SIZE);
+
+        const results = await Promise.all(
+            batch.map(cat =>
+                fetchWithRetry(cat).then(data => ({ data, cat }))
+            )
+        );
+
+        let aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
+
+        results.forEach(({ data, cat }) => {
+
+            if (!data) return;
+
+            const rawProducts =
+                data
+                ?.aliexpress_affiliate_product_query_response
+                ?.resp_result
+                ?.result
+                ?.products
+                ?.product || [];
+
+            const mapped = rawProducts.map(item => ({
+
+                id: item.product_id,
+                source: "ali",
+                title: item.product_title || item.title || "No Title",
+                image: item.product_main_image_url,
+                price: Number(item.target_sale_price || 0),
+                originalPrice: Number(item.target_original_price || 0),
+                discount: item.discount || "",
+                link: item.product_detail_url,
+                rating: item.evaluate_rate || "0",
+                reviews: item.lastest_volume || 0,
+                category: cat.name,
+                featured: false,
+                bestDeal: false,
+                newArrival: false,
+                clicks: 0
+
+            }));
+
+            mapped.forEach(item => {
+                aliCache[String(item.id)] = item;
+            });
+
+            allProducts = [...allProducts, ...mapped];
+
+        });
+
+        localStorage.setItem("aliProductsCache", JSON.stringify(aliCache));
+
+        renderProducts();
+
+        await delay(300);
+
+    }
+
+}
+
+function showLoadMoreCategoriesButton(remainingCategories) {
+
+    const existingBtn = document.getElementById("loadMoreCategoriesBtn");
+
+    if (existingBtn) existingBtn.remove();
+
+    if (!remainingCategories || remainingCategories.length === 0) return;
+
+    if (!productsContainer || !productsContainer.parentNode) return;
+
+    const btn = document.createElement("button");
+
+    btn.id = "loadMoreCategoriesBtn";
+    btn.textContent = "🔄 Load More Products";
+    btn.className = "buy-btn";
+    btn.style.display = "block";
+    btn.style.margin = "20px auto";
+    btn.style.maxWidth = "300px";
+    btn.style.border = "none";
+    btn.style.cursor = "pointer";
+
+    btn.addEventListener("click", async () => {
+
+        btn.disabled = true;
+        btn.textContent = "Loading...";
+
+        await loadCategoryBatch(remainingCategories);
+
+        btn.remove();
+
+    });
+
+    productsContainer.parentNode.insertBefore(
+        btn,
+        productsContainer.nextSibling
+    );
+
+}
 
 async function loadAllProducts() {
 
@@ -770,13 +906,13 @@ async function loadAllProducts() {
 
         renderProducts();
 
-        // 3) Build the list of AliExpress category searches (for the main Products list only â
+        // 3) Build the list of AliExpress category searches (for the main Products list only —
                 //    these NEVER appear in Featured / Best Deal / New Arrival)
                 let aliCategoryList = [];
 
                 if (categoryFilter) {
 
-                    // A specific category was clicked â load ONLY that category, fast
+                    // A specific category was clicked — load ONLY that category, fast
                     aliCategoryList = [
                         {
                             name: categoryFilter,
@@ -818,86 +954,28 @@ async function loadAllProducts() {
 
         }
 
-        // 4) Get AliExpress products for each category (one at a time, to avoid rate limits / aborts)
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        // Remove any leftover "Load More" button from a previous load
+        const oldLoadMoreBtn = document.getElementById("loadMoreCategoriesBtn");
+        if (oldLoadMoreBtn) oldLoadMoreBtn.remove();
 
-        for (const cat of aliCategoryList) {
+        // 4) On the general homepage (no search/category filter), only auto-load the
+        //    first 6 categories — this keeps the initial page load fast (better LCP).
+        //    The rest load only when the user clicks "Load More Products".
+        const INITIAL_CATEGORY_LIMIT = 6;
 
-            let data = null;
+        let initialCategories = aliCategoryList;
+        let remainingCategories = [];
 
-            try {
+        if (!categoryFilter && !keyword && aliCategoryList.length > INITIAL_CATEGORY_LIMIT) {
 
-                data = await fetchAliExpressProducts(cat.keyword);
-
-            } catch (err) {
-
-                console.error("AliExpress Error for", cat.name, "- retrying...", err);
-
-                await delay(500);
-
-                try {
-
-                    data = await fetchAliExpressProducts(cat.keyword);
-
-                } catch (err2) {
-
-                    console.error("AliExpress Error for", cat.name, "- skipped", err2);
-
-
-                }
-
-            }
-
-            if (data) {
-
-                const rawProducts =
-                    data
-                    ?.aliexpress_affiliate_product_query_response
-                    ?.resp_result
-                    ?.result
-                    ?.products
-                    ?.product || [];
-
-                const mapped = rawProducts.map(item => ({
-
-                    id: item.product_id,
-                    source: "ali",
-                    title: item.product_title || item.title || "No Title",
-                    image: item.product_main_image_url,
-                    price: Number(item.target_sale_price || 0),
-                    originalPrice: Number(item.target_original_price || 0),
-                    discount: item.discount || "",
-                    link: item.product_detail_url,
-                    rating: item.evaluate_rate || "0",
-                    reviews: item.lastest_volume || 0,
-                    category: cat.name,
-                    featured: false,
-                    bestDeal: false,
-                    newArrival: false,
-                    clicks: 0
-
-                }));
-
-                // Save these locally so product.html can find them later
-                let aliCache = JSON.parse(localStorage.getItem("aliProductsCache")) || {};
-
-                mapped.forEach(item => {
-                    aliCache[String(item.id)] = item;
-                });
-
-                localStorage.setItem("aliProductsCache", JSON.stringify(aliCache));
-
-                allProducts = [...allProducts, ...mapped];
-
-                renderProducts();
-
-            }
-
-            await delay(500);
+            initialCategories = aliCategoryList.slice(0, INITIAL_CATEGORY_LIMIT);
+            remainingCategories = aliCategoryList.slice(INITIAL_CATEGORY_LIMIT);
 
         }
+
+        await loadCategoryBatch(initialCategories);
+
+        showLoadMoreCategoriesButton(remainingCategories);
 
     } catch (error) {
 
@@ -909,7 +987,7 @@ async function loadAllProducts() {
 
                 <div style="padding:40px;text-align:center">
 
-                    <h2>â Failed to load products</h2>
+                    <h2>❌ Failed to load products</h2>
 
                     <p>${error.message}</p>
 
@@ -925,7 +1003,7 @@ async function loadAllProducts() {
 
 
 // ======================
-// Render Products (no re-fetching â just displays allProducts)
+// Render Products (no re-fetching — just displays allProducts)
 // ======================
 function renderProducts() {
 
@@ -1152,7 +1230,7 @@ loadBanners();
 loadAllProducts();
 
 // ======================
-// Click Tracking (own products only â increments "clicks" field in Firestore)
+// Click Tracking (own products only — increments "clicks" field in Firestore)
 // ======================
 document.addEventListener("click", async (e) => {
 
