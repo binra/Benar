@@ -53,7 +53,7 @@ async function loadProduct() {
     // ======================
     // SEO: set page title + meta tags dynamically per product
     // ======================
-    document.title = `${data.title} | Novexa`;
+    document.title = `${data.title} | BenarStore`;
 
     function setMetaTag(selector, attr, value) {
 
@@ -81,7 +81,7 @@ async function loadProduct() {
         (data.description || data.title || "").slice(0, 155);
 
     setMetaTag('meta[name="description"]', "description", shortDescription);
-    setMetaTag('meta[property="og:title"]', "og:title", `${data.title} | Novexa`);
+    setMetaTag('meta[property="og:title"]', "og:title", `${data.title} | BenarStore`);
     setMetaTag('meta[property="og:description"]', "og:description", shortDescription);
     setMetaTag('meta[property="og:image"]', "og:image", data.image || "");
     setMetaTag('meta[property="og:type"]', "og:type", "product");
