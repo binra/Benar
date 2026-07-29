@@ -171,7 +171,7 @@ async function loadProduct() {
                 </p>
 
                 <a href="${data.link}" target="_blank" class="buy-btn">
-                    ${isFromFirestore ? "Buy on Amazon" : "Get Best Price"}
+                    ${isFromFirestore ? "Buy Now" : "Get Best Price"}
                 </a>
 
                 <br><br>
